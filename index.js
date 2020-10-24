@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 app.get('/webhook', (req, res) => {
   
   // Your verify token. Should be a random string.
-  let VERIFY_TOKEN = "webhookco"
+  let VERIFY_TOKEN = process.env.VERIFY_TOKEN;
   
   // Parse the query params
   let mode = req.query['hub.mode'];
@@ -88,13 +88,11 @@ function callSendAPI(sender_psid, response) {
       message: response
   };
 
-  console.log(PAGE_ACCESS_TOKEN);
-
   // Send the HTTP request to the Messenger Platform
   request(
       {
         uri: "https://graph.facebook.com/v8.0/me/messages",
-        qs: { access_token: PAGE_ACCESS_TOKEN },
+        qs: { access_token: process.env.PAGE_ACCESS_TOKEN },
         method: "POST",
         json: request_body
       },
