@@ -206,12 +206,12 @@ We first define a wrapper function `sendMessage` that takes in `sender_psid` and
 
 ```
 // Wrapper method to convert text message string to response object, and sends the message
-function sendMessage(sender_psid, message) {
+function getResponseFromMessage(message) {
   const response = {
       text: message
   };
-  
-  callSendAPI(sender_psid, response);
+
+  return response;
 }
 ```
 
@@ -237,7 +237,8 @@ app.post('/webhook', (req, res) => {
       let message = webhook_event['message']['text'];
       console.log('Message received from sender ' + sender_psid + ' : ' + message);
       
-      sendMessage(sender_psid, message);
+      let response = getResponseFromMessage(message);
+      callSendAPI(sender_psid, response);
     });
     
     // Returns a '200 OK' response to all requests
@@ -256,13 +257,12 @@ Try it out! You should see the following behaviour:
 
 ### Sending Standard Responses
 
-Now let us implement some standard reponses. First, replace `sendMessage` with a new `processMessage` function that will be implemented later.
+Now let us implement some standard reponses. First, replace `sendMessage` with a new `processMessage` function that will be implemented.
 
 The `processMessage` function encapsulates the implementation of the standard responses.
 
 ```
-// Processes and sends text message
-function processMessage(sender_psid, message) {
+function processMessage(message) {
   
   message = message.toLowerCase();
 
@@ -282,13 +282,13 @@ function processMessage(sender_psid, message) {
 
   for (const key in responses) {
     if (message.includes(key)) {
-      sendMessage(sender_psid, responses[key]);
+      return getResponseFromMessage(responses[key]);
       break;
     }
   }
 
   // Message does not match any keyword, send default response
-  sendMessage(sender_psid, "We could not understand your message. Kindly rephrase your message and send us again.");
+  return getResponseFromMessage("We could not understand your message. Kindly rephrase your message and send us again.");
 
 }
 ```

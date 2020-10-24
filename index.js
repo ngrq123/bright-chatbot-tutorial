@@ -64,7 +64,8 @@ app.post('/webhook', (req, res) => {
       let message = webhook_event['message']['text'];
       console.log('Message received from sender ' + sender_psid + ' : ' + message);
       
-      processMessage(sender_psid, message);
+      let response = processMessage(sender_psid);
+      callSendAPI(sender_psid, response);
     });
     
     // Returns a '200 OK' response to all requests
@@ -107,16 +108,16 @@ function callSendAPI(sender_psid, response) {
 }
 
 // Wrapper method to convert text message string to response object, and sends the message
-function sendMessage(sender_psid, message) {
+function getResponseFromMessage(message) {
   const response = {
       text: message
   };
 
-  callSendAPI(sender_psid, response);
+  return response;
 }
 
 // Processes and sends text message
-function processMessage(sender_psid, message) {
+function processMessage(message) {
   
   message = message.toLowerCase();
 
@@ -136,12 +137,12 @@ function processMessage(sender_psid, message) {
 
   for (const key in responses) {
     if (message.includes(key)) {
-      sendMessage(sender_psid, responses[key]);
+      return getResponseFromMessage(responses[key]);
       break;
     }
   }
 
   // Message does not match any keyword, send default response
-  sendMessage(sender_psid, "We could not understand your message. Kindly rephrase your message and send us again.");
+  return getResponseFromMessage("We could not understand your message. Kindly rephrase your message and send us again.");
 
 }
