@@ -64,7 +64,7 @@ app.post('/webhook', (req, res) => {
       let message = webhook_event['message']['text'];
       console.log('Message received from sender ' + sender_psid + ' : ' + message);
       
-      let response = processMessage(sender_psid);
+      let response = processMessage(message);
       callSendAPI(sender_psid, response);
     });
     
