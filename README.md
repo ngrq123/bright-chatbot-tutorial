@@ -4,6 +4,8 @@
 
 ## Pre-Requisites
 
+The following subsections list the background knowledge and how to get started prior to creating a chatbot.
+
 ### JavaScript Knowledge
 
 ### Facebook Page
@@ -213,6 +215,7 @@ function sendMessage(sender_psid, message) {
 }
 ```
 
+### Sending Back the Same Message
 We will first start by responding to the same message as what the user sent.
 
 ```
@@ -246,5 +249,50 @@ app.post('/webhook', (req, res) => {
   
 });
 ```
+
+Try it out! You should see the following behaviour:
+
+![](images/send_same_message.png)
+
+### Sending Standard Responses
+
+Now let us implement some standard reponses. First, replace `sendMessage` with a new `processMessage` function that will be implemented later.
+
+The `processMessage` function encapsulates the implementation of the standard responses.
+
+```
+// Processes and sends text message
+function processMessage(sender_psid, message) {
+  
+  message = message.toLowerCase();
+
+  let responses = {
+    hi: "Hi there! Welcome to Bright. How can I help you?",
+    bright: "Bright is a social enterprise where we provide vocational training to adults with intellectual disabilities.\n\n" +
+        "We started a range of social enterprise projects to provide alternative work engagement opportunities for our adult trainees. " + 
+        "Some of the projects began as therapy programmes which encourage the development of fine motor skills; others provide a realistic vocational training environment.\n\n" +
+        "All net revenue earned from the sale of our products and services go towards paying a monthly allowance for our clients' work, as well as their lunch expenses while undergoing training.",
+    proceeds:
+        "All net revenue earned from the sale of our products and services go towards paying a monthly allowance for our clients' work, as well as their lunch expenses while undergoing training.",
+    support:
+        "We support adults with intellectual disabilities. We started a range of social enterprise projects to provide alternative work engagement for our adult trainees.",
+    sell: "We sell craft and baker goods.\nLike our Facebook page http://fb.me/brightsocialsg to stay updated!",
+    safe: "Our cookies are made by our clients in a clean and sanitised environment. The cookies are safe to consume before the expiry date that is printed on the packaging."
+  };
+
+  for (const key in responses) {
+    if (message.includes(key)) {
+      sendMessage(sender_psid, responses[key]);
+      break;
+    }
+  }
+
+  // Message does not match any keyword, send default response
+  sendMessage(sender_psid, "We could not understand your message. Kindly rephrase your message and send us again.");
+
+}
+```
+
+Now, whenever your message includes any of those keywords in the `responses` object, a standard response message will be sent.
 
 ## Introduction to `Wit.ai` Natural Language Processing (NLP)
