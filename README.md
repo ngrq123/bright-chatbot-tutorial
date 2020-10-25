@@ -341,7 +341,7 @@ Wit.ai is a NLP service that provides a user-friendly interface that facilitates
 
 Sign in to Wit.ai using Facebook and click on **New App**. 
 
-![](images/4.1.jpg)
+![](images/4_1.jpg)
 
 Let us name our application **BrightChatbot** and make its visibility **Private**. Click on **Create**. 
 
