@@ -334,3 +334,120 @@ function processMessage(message) {
 Now, whenever your message includes any of those keywords in the `responses` object, a standard response message will be sent.
 
 ## Introduction to `Wit.ai` Natural Language Processing (NLP)
+
+Wit.ai is a NLP service that provides a user-friendly interface that facilitates easy training of your Facebook Messenger chatbot. Using Wit.ai’s own NLP engine, Wit.ai is essentially used to build the “brain” of Bright chatbot.
+
+### Creating a `Wit.ai` Application
+
+Sign in to Wit.ai using Facebook and click on **New App**. 
+
+[image 4.1]
+
+Let us name our application **BrightChatbot** and make its visibility **Private**. Click on **Create**. 
+
+[image 4.2].
+
+Congratulations, you’ve now made your first `Wit.ai` application. 
+
+[image 4.3]
+
+You will see three side tabs titled Understanding, Management and Insights. Let’s start by training out chatbot on the Understanding tab.
+
+### Example of a Built-in Trait
+
+Click the **Understanding** tab.  A sentence, such as a question to the chatbot, is known as an **utterance**. The intention behind this utterance is quite simply, the **intent**. 
+
+`Wit.ai` has built-in entities that can be readily used for a number of common conversation topics. We often start off a conversation with a greeting and `Wit.ai` has a corresponding trait called `wit/greetings`. Traits are used to capture intents from the whole utterance.
+Our `Wit.ai` application is pre-trained to identify a number common greetings. Whether you type “hello”, “hi” or even “aloha” in the Utterance section, the trait will be identified as `wit/greetings`.
+
+[image 4.4]
+
+### Training the Model to Understand the Intent of a Message
+
+Let’s train the chatbot to understand a generic question seeking a product recommendation.
+
+In the Utterance tab, type the utterance “I want to buy something”. Click the **Choose or add intent** drop-down list and create new intent **recommendation**.
+
+[image 4.5]
+
+Click **Train and Validate**.
+- You will see **Training scheduled** followed by **Training ongoing** on the top right-hand corner as `Wit.ai` trains to identify the recommendation intent from your sentence
+- **Training complete** is shown when the training is finished
+
+[image 4.6]
+
+During the training process, there is no need to wait for the previous utterance’s training to complete before training new utterances. You can keep training new utterances back-to-back as the training process for each utterance can run in parallel on `Wit.ai`.
+
+### Training the Model to Understand the Entity in a Message
+
+What if instead of a general recommendation, the buyer wants to specifically buy a type of product such as cookies? We **classify cookies as `baker`** type products and would need the chatbot to recognise "cookies" as the **product_type** entity.
+
+Set utterance as “What types of cookies do you have?”
+The intent is `recommendation` by default as that’s the only intent we have trained so far.
+
+To identify the intent, highlight "cookies":
+
+[image 4.7] 
+
+Create the entity **product_type**. The entity is now shown prior to training. For more complicated sentences with multiple entities, you can highlight and label them one by one.
+
+Change the **Resolved value** to `baker` as we want the cookies to be identified as in the baker category.
+
+[image 4.8]
+
+Now **Train and Validate**. The chatbot’s learning is not limited to only the utterances shared through **Understand**. The model itself will be able to infer additional ways the same question or utterance can be asked based on the few examples provided by you. 
+
+### Adding more Training Data
+
+Let’s train the chatbot to understand more utterances and intents to help it better understand future queries. Train it with the following:
+
+| Sentence | Intent |
+| --- | --- |
+| How do I know if they are safe to consume? | `enquiry_general` |
+| I need help | `enquiry_general` |
+| When is delivery coming? | `enquiry_delivery` |
+| When is my order arriving? | `enquiry_delivery` |
+| What kind of cookies do you have? | `recommendation` |
+| Can you send me the list of products here to choose? | `recommendation` |
+
+We have added in a few more `recommendation` intents as well, to help the model further differentiate between the three unique entities.
+
+### Making Changes in the Management Tab
+
+Oops, we forgot to add entities to the sentences in bold in the table we used for training earlier! Let’s add the entities using the **Management** tab. 
+
+Click on **Management**, then **Utterances**. 
+
+[image 4.9]
+
+Find the sentence “How do I know if they are safe to consume” that you have previously trained the chatbot with and click on the down arrow beside it.
+
+[image 4.10]
+
+You can now add entities to it! Highlight the word "safe" and add an entity called `safety`.
+
+[image 4.11]
+
+Now, train!
+
+That’s really all there is to training your chatbot and managing it on Wit.ai
+
+Deletions of any intents, entities and utterances can be handled in the management tab and their respective sections.
+
+Before we conclude with a test of our training’s accuracy, update the entities for the following two sentences that we have previously trained:
+- When is my delivery coming?
+- When is my order arriving?
+
+Set their entities to `estimated_arrival` for the text "when".
+
+### Evaluating Performance
+
+See if the chatbot can correctly identify the intents for these questions?
+
+| Utterance | Actual Intent |
+| --- | --- |
+| What would you suggest? | `recommendation` |
+| When will my order be here? | `enquiry_delivery` |
+
+It is completely ok if the model does not recognise all of the intents correctly. In machine learning, the model will only work well with lots and lots of training. Therefore, do remember to train the model with these new data!
+
