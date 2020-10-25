@@ -345,11 +345,11 @@ Sign in to Wit.ai using Facebook and click on **New App**.
 
 Let us name our application **BrightChatbot** and make its visibility **Private**. Click on **Create**. 
 
-![](images/4.2.jpg)
+![](images/4_2.jpg)
 
 Congratulations, you’ve now made your first `Wit.ai` application. 
 
-![](images/4.3.jpg)
+![](images/4_3.jpg)
 
 You will see three side tabs titled Understanding, Management and Insights. Let’s start by training out chatbot on the Understanding tab.
 
@@ -360,7 +360,7 @@ Click the **Understanding** tab.  A sentence, such as a question to the chatbot,
 `Wit.ai` has built-in entities that can be readily used for a number of common conversation topics. We often start off a conversation with a greeting and `Wit.ai` has a corresponding trait called `wit/greetings`. Traits are used to capture intents from the whole utterance.
 Our `Wit.ai` application is pre-trained to identify a number common greetings. Whether you type “hello”, “hi” or even “aloha” in the Utterance section, the trait will be identified as `wit/greetings`.
 
-![](images/4.4.jpg)
+![](images/4_4.jpg)
 
 ### Training the Model to Understand the Intent of a Message
 
@@ -368,13 +368,13 @@ Let’s train the chatbot to understand a generic question seeking a product rec
 
 In the Utterance tab, type the utterance “I want to buy something”. Click the **Choose or add intent** drop-down list and create new intent **recommendation**.
 
-![](images/4.5.jpg)
+![](images/4_5.jpg)
 
 Click **Train and Validate**.
 - You will see **Training scheduled** followed by **Training ongoing** on the top right-hand corner as `Wit.ai` trains to identify the recommendation intent from your sentence
 - **Training complete** is shown when the training is finished
 
-![](images/4.6.jpg)
+![](images/4_6.jpg)
 
 During the training process, there is no need to wait for the previous utterance’s training to complete before training new utterances. You can keep training new utterances back-to-back as the training process for each utterance can run in parallel on `Wit.ai`.
 
@@ -387,13 +387,13 @@ The intent is `recommendation` by default as that’s the only intent we have tr
 
 To identify the intent, highlight "cookies":
 
-![](images/4.7.jpg)
+![](images/4_7.jpg)
 
 Create the entity **product_type**. The entity is now shown prior to training. For more complicated sentences with multiple entities, you can highlight and label them one by one.
 
 Change the **Resolved value** to `baker` as we want the cookies to be identified as in the baker category.
 
-![](images/4.8.jpg)
+![](images/4_8.jpg)
 
 Now **Train and Validate**. The chatbot’s learning is not limited to only the utterances shared through **Understand**. The model itself will be able to infer additional ways the same question or utterance can be asked based on the few examples provided by you. 
 
@@ -418,15 +418,15 @@ Oops, we forgot to add entities to the sentences in bold in the table we used fo
 
 Click on **Management**, then **Utterances**. 
 
-![](images/4.9.jpg)
+![](images/4_9.jpg)
 
 Find the sentence “How do I know if they are safe to consume” that you have previously trained the chatbot with and click on the down arrow beside it.
 
-![](images/4.10.jpg)
+![](images/4_10.jpg)
 
 You can now add entities to it! Highlight the word "safe" and add an entity called `safety`.
 
-![](images/4.11.jpg)
+![](images/4_11.jpg)
 
 Now, train!
 
