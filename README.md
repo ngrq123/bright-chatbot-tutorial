@@ -1,4 +1,4 @@
-# Learn to Create Messenger Experiences with Bright: E-Commence Chatbot
+# Learn to Create Messenger Experiences with Bright E-Commerce Chatbot
 
 ## Introduction
 
@@ -8,8 +8,20 @@ The following subsections list the background knowledge and how to get started p
 
 ### JavaScript Knowledge
 
+Basic Javascript knowledge on objects, conditional statements, and functions will be helpful in the implementation of Bright chatbot. Specific knowledge on Node.js is also used in this tutorial which acts as the server to handle communications between Bright and Facebook.
+
+Browse the following resources below to learn more about the technologies used:
+- JavaScript:  https://javascript.info/
+- Basic Node.js: https://www.w3schools.com/nodejs/
+
+### Git Knowledge
+
+Git is a version control system that will be mainly used to update code used to build the chatbot. More information on Git can be found on https://git-scm.com/
+
+We recommend versioning your code on a GitHub repository.
+
 ### Facebook Page
-Creating a Facebook Page is a key step in your journey to creating a messager experience. Here are a few simple steps to help you get started:
+Creating a Facebook Page is a key step in your journey to creating a Messenger experience. Here are a few simple steps to help you get started:
 
 1. Go to facebook.com/pages/create - it should lead you to a page shown below
 
@@ -53,11 +65,27 @@ These are the important few steps to getting started before you can develop your
 
 #### Create an App on Facebook for Developers
 
+1. Head to https://developers.facebook.com, click on **My Apps**
+2. Click on **Create App**, located on the top right of the screen
+3. Select **Manage Business Integration**
+4. Enter your **App Display Name** and **App Purpose**
+5. After creating the app, on the side bar, click on add products, leading you to the **Add Products** section on the main page. Find the **Messenger** product and click **Set Up**
+
+Next, the following steps will be detailed in the next two sections. To summarise:
+
+6. You will have to generate a page access token by adding a new page to the Messenger product, after clicking on the **Add or Remove Pages** button, select your Facebook page that you would like to add. After adding the page, you will be able to see a **Generate Token** button, which will give you a page access token that will be used on your Node.js for communication with Facebook via the Send API.
+7. Set up a callback URL by entering your callback URL (location where your Node.js server is hosted) and also enter the verify token (which is a random string) that is determined by you in the Node.js server during the Node.js server setup. Lastly, click on **Verify and Save** to confirm your callback URL.
+8. Now you’re ready to test the app, go to Messenger, and type a message to your Page. If your Node.js server (with the callback URL) receives a webhook event, you’ve successfully set up your app to receive messages!
+
 #### Create the Webhook
 
 Webhooks are API endpoints which you expose, to allow client(s) to connect to. This allows the users to interact to either send data or collect data from your servers. In this case, we are using this endpoint as an interaction between your webhook and your Facebook for Developers App, to send and receive data from our chatbot on your Facebook business page. 
 
-To begin, first create `index.js` with the following code:
+1. Create a directory (folder), and navigate into it via the command line
+2. Next, create an empty, `index.js` file in your project folder
+3. Issue the command, `npm init` on the command line, accept default for all questions, and this will create `package.json` in your project folder automatically.
+4. Issue the command, `npm install express body-parser --save`, this installs the Express.js http server framework module, and add them as dependencies in your `package.json` file
+5. Create a server that listens for communication at the default port by adding the following code below into your `index.js` file
 
 ```
 'use strict';
@@ -79,7 +107,7 @@ app.get('/', (req, res) => {
 })
 ```
 
-Let us now create a `GET` request `/webhook` endpoint for your Facebook for Developers App to verify the webhook. We suggest adding your verification token in a `.env` file.
+6. Let us now create a `GET` request `/webhook` endpoint for your Facebook for Developers App to verify the webhook. We suggest adding your verification token in a `.env` file.
 
 ```
 // Adds support for GET requests to our webhook
@@ -111,6 +139,18 @@ app.get('/webhook', (req, res) => {
 });
 ```
 
+7. Finally, you can now test your webhook by issuing the curl command (replace the <VERIFY_TOKEN> with your own token that you had specified in the previous step:
+
+```
+curl -X GET "localhost:1337/webhook?hub.verify_token=<VERIFY_TOKEN>&hub.challenge=CHALLENGE_ACCEPTED&hub.mode=subscribe"
+```
+
+#### Hosting on Heroku
+
+As the chatbot's callback URL requires a HTTPS endpoint, we recommend hosting the chatbot on Heroku. The guide on how to deploy can be found at https://devcenter.heroku.com/articles/getting-started-with-nodejs?singlepage=true
+
+Next, to connect to a Git repository, you can utilise the GitHub integration in Heroku, which allows for automatic deployment whenever your `main` branch is updated https://devcenter.heroku.com/articles/github-integration
+
 #### Link the Webhook with your Facebook for Developers App
 
 So how can you connect with Facebook? 
@@ -127,9 +167,7 @@ This is how it looks like if you have successfully added the webhook callback UR
 
 There you have it, you have successfully connected your chatbot application with Facebook!
 
-## Receiving Messages
-
-## Sending Messages
+## Sending and Receiving Messages
 
 Sending messages require the use of Send API via a post request coupled with your page access token included in your URL query string.
 
@@ -215,7 +253,7 @@ function getResponseFromMessage(message) {
 }
 ```
 
-### Sending Back the Same Message
+### Receiving and Sending Back the Same Message
 We will first start by responding to the same message as what the user sent.
 
 ```
