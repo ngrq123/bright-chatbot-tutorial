@@ -1,4 +1,4 @@
-# Learn to Create Messenger Experiences with Bright E-Commerce Chatbot
+# Learn to Create Messenger Experiences with Bright Commerce Chatbot
 
 ## Introduction
 
@@ -575,4 +575,95 @@ Also, notice how the greeting is handled differently? By utilising `Wit.ai`'s bu
 
 ## Solution Overview
 
-## Listing Products and Giving Recommendations
+## Listing Products
+
+### Introduction to Templates
+
+[Templates](https://developers.facebook.com/docs/messenger-platform/send-messages/templates) offer a richer experience for users by adding more ways to interact with the chatbot.
+
+The template that we will use is the carousel of generic template, which consists of a list of elements. To do so, we create a new function `generateCarouselofProductsResponse` that takes in a list of products and converts to a response with a `template` attachment.
+
+```
+function generateCarouselOfProductsResponse(products) {
+  
+  return {
+    "attachment": {
+      "type": "template",
+      "payload": {
+        "template_type": "generic",
+        "elements":
+        products.map(p => {
+          let subtitle = p['price'].toFixed(2);
+          if (p['pattern']) {
+            subtitle = '(' + p['pattern'] + ') $' + subtitle;
+          }
+
+          return {
+            title: p['title'],
+            subtitle: subtitle,
+            // image_url: p['image_link'],
+            buttons: [
+              {
+                type: "postback",
+                title: "Learn More",
+                payload: `enquiry_product ${p['title']}`
+              }, 
+              {
+                type: "postback",
+                title: `Add to Cart`,
+                payload: `cart_add ${p['pid']}`
+              }
+            ]
+          }
+        })
+      }
+    }
+  }
+
+}
+```
+
+### Updating `processMessage`
+
+Previously, we have trained the sentence "" with the `recommendation` intent. Now, we add the intent into the switch case.
+
+```
+// Processes and sends text message
+function processMessage(message, nlp) {
+  ...
+  switch (intent) {
+    ...
+
+    case 'recommendation':
+      // Get products from database
+      let products = [
+        {
+          pid: 123,
+          title: 'Cookies 1',
+          pattern: 'Box of 6',
+          price: 15.5
+        },
+        {
+          pid: 123,
+          title: 'Cookies 2',
+          pattern: 'Box of 9',
+          price: 18.5
+        }
+      ]
+
+      return generateCarouselOfProductsResponse(products);
+
+    default:
+      return getDefaultResponse();
+  }
+
+}
+```
+
+To process the recommendation intent, we queried the database for all products and passed it into the new `generateCarouselOfProductsResponse` function.
+
+## Adding to Cart
+
+## Acknowledgements
+
+Special shoutout to Douglas Sim and Jelissa Ong, who helped build the Bright Social Enterprise Commerce Bot in the previous Messenger hackathon, and agreeing to allow us to use the Bright chatbot solution for this hackathon!

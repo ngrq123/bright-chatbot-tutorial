@@ -93,6 +93,8 @@ function callSendAPI(sender_psid, response) {
       message: response
   };
 
+  // console.log(request_body);
+
   // Send the HTTP request to the Messenger Platform
   request(
       {
@@ -169,6 +171,25 @@ function processMessage(message, nlp) {
       console.log('Entity with highest confidence: ' + entity);
 
       return handleGeneralEnquiry(entity);
+    case 'recommendation':
+      // Get products from database
+      let products = [
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 6',
+          price: 15.5
+        },
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 9',
+          price: 18.5
+        }
+      ]
+
+      return generateCarouselOfProductsResponse(products);
+
     default:
       return getDefaultResponse();
   }
@@ -193,4 +214,42 @@ function handleGeneralEnquiry(entity) {
   };
   
   return getResponseFromMessage(responses[entity]);
+}
+
+function generateCarouselOfProductsResponse(products) {
+  
+  return {
+    "attachment": {
+      "type": "template",
+      "payload": {
+        "template_type": "generic",
+        "elements":
+        products.map(p => {
+          let subtitle = p['price'].toFixed(2);
+          if (p['pattern']) {
+            subtitle = '(' + p['pattern'] + ') $' + subtitle;
+          }
+
+          return {
+            title: p['title'],
+            subtitle: subtitle,
+            // image_url: p['image_link'],
+            buttons: [
+              {
+                type: "postback",
+                title: "Learn More",
+                payload: `enquiry_product ${p['title']}`
+              }, 
+              {
+                type: "postback",
+                title: `Add to Cart`,
+                payload: `cart_add ${p['pid']}`
+              }
+            ]
+          }
+        })
+      }
+    }
+  }
+
 }
