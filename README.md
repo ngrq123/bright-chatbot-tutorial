@@ -337,7 +337,7 @@ Now, whenever your message includes any of those keywords in the `responses` obj
 
 Wit.ai is a NLP service that provides a user-friendly interface that facilitates easy training of your Facebook Messenger chatbot. Using Wit.ai’s own NLP engine, Wit.ai is essentially used to build the “brain” of Bright chatbot.
 
-### Creating a `Wit.ai` Application
+### Creating a Customised `Wit.ai` Application
 
 Sign in to Wit.ai using Facebook and click on **New App**. 
 
@@ -451,3 +451,128 @@ See if the chatbot can correctly identify the intents for these questions?
 
 It is completely ok if the model does not recognise all of the intents correctly. In machine learning, the model will only work well with lots and lots of training. Therefore, do remember to train the model with these new data!
 
+### Connecting the Custom `Wit.ai` Model to your Facebook for Developers App
+
+You can now connect your `Wit.ai` model to your Facebook for Developers App! You can either use the Messenger Settings or Graph API to do so. The steps to connect the model to your application can be found at https://developers.facebook.com/docs/messenger-platform/built-in-nlp#customizing_nlp
+
+## Processing Messages with NLP
+
+Now we are ready to use your `Wit.ai` model (NLP model) outputs to process messages! Let us first understand how this works. When a user interacts with Bright, the message will first be sent to the NLP model. The outputs of the model will be sent in the message webhook and can be retrieved in the `nlp` key in the `message` object.
+
+We will now train the messages that we have handled with the standard responses in the NLP model. All of the messages are of the same intent `enquiry_general`, but the entities of the general enquiry are different, which allows us to differentiate between the queries the user has.
+
+| Sentence | Intent | Phrase -> Entity |
+| --- | --- | --- |
+| Who is Bright? | `enquiry_general` | Bright -> `organisation` |
+| Where does your proceeds go to? | `enquiry_general` | proceeds -> `profit` |
+| Who makes the products? | `enquiry_general` | Who makes -> `manufacturer` |
+| What do you sell? | `enquiry_general` | sell -> `products` |
+| How do I know if they are safe to consume? | `enquiry_general` | safe -> `safety` |
+
+Let us modify our post request function to retrieve the NLP model output and pass it in as a new, second argument in `processMessage`.
+
+```
+console.log('Message received from sender ' + sender_psid + ' : ' + message);
+
+let nlp = webhook_event['message']['nlp'];
+
+let response = processMessage(message, nlp);
+callSendAPI(sender_psid, response);
+```
+
+Let us first wrap the default message in a new `getDefaultResponse` function, which will be used in early returns.
+
+```
+function getDefaultResponse() {
+  return getResponseFromMessage("We could not understand your message. Kindly rephrase your message and send us again.");
+}
+```
+
+We will then modify the processMessage function, and abstracting the general enquiry handling into another function `handleGeneralEnquiry`.
+
+```
+// Processes and sends text message
+function processMessage(message, nlp) {
+  
+  if (nlp['intents'].length === 0) {
+    
+    // Check if greeting
+    let traits = nlp['traits'];
+
+    if (traits['wit$greetings'] && traits['wit$greetings'][0]['value'] === 'true') {
+      console.log('Is greeting');
+      return getResponseFromMessage('Hi there! Welcome to Bright. How can I help you?');
+    }
+    
+    console.log('Returning default response');
+    return getDefaultResponse();
+  }
+
+  console.log('Intents inferred from NLP model: ')
+  console.table(nlp['intents']);
+
+  // Get the intent with the highest confidence
+  let intent = nlp['intents'][0]['name']
+  let confidence = nlp['intents'][0]['confidence']
+
+  // If confidence of intent is less than threshold, do not process
+  if (confidence < 0.7) return getDefaultResponse();
+
+  switch (intent) {
+    case 'enquiry_general':
+      let entities = nlp['entities'];
+
+      // Get entity with highest confidence
+      let entity = null;
+      let highest_confidence = 0;
+      for (const e in entities) {
+        let confidence = entities[e][0]['confidence'];
+        if (confidence > highest_confidence) {
+          highest_confidence = confidence;
+          entity = entities[e][0]['name'];
+        }
+      }
+
+      console.log('Entity with highest confidence: ' + entity);
+
+      return handleGeneralEnquiry(entity);
+    default:
+      return getDefaultResponse();
+  }
+
+}
+```
+
+We set a arbitrary confidence threshold of 0.7 in order to prevent handling of messages with low confidence.
+
+```
+function handleGeneralEnquiry(entity) {
+
+  if (entity == null) return getDefaultResponse();
+
+  let responses = {
+    organisation: "Bright is a social enterprise where we provide vocational training to adults with intellectual disabilities.\n\n" +
+        "We started a range of social enterprise projects to provide alternative work engagement opportunities for our adult trainees. " + 
+        "Some of the projects began as therapy programmes which encourage the development of fine motor skills; others provide a realistic vocational training environment.\n\n" +
+        "All net revenue earned from the sale of our products and services go towards paying a monthly allowance for our clients' work, as well as their lunch expenses while undergoing training.",
+    profit:
+        "All net revenue earned from the sale of our products and services go towards paying a monthly allowance for our clients' work, as well as their lunch expenses while undergoing training.",
+    manufacturer:
+        "We support adults with intellectual disabilities. We started a range of social enterprise projects to provide alternative work engagement for our adult trainees.",
+    products: "We sell craft and baker goods.\nLike our Facebook page http://fb.me/brightsocialsg to stay updated!",
+    safety: "Our cookies are made by our clients in a clean and sanitised environment. The cookies are safe to consume before the expiry date that is printed on the packaging."
+  };
+  
+  return getResponseFromMessage(responses[entity]);
+}
+```
+
+Also, notice how the greeting is handled differently? By utilising `Wit.ai`'s built-in `greetings` trait, we are able to leverage on the detection based on pretrained data, which means that we do not have to train greetings like "Hi" ourselves!
+
+![](images/pretrained_greetings.png)
+
+## Creating a Business Database
+
+## Solution Overview
+
+## Listing Products and Giving Recommendations

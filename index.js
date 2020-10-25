@@ -60,11 +60,15 @@ app.post('/webhook', (req, res) => {
       // Gets the message. entry.messaging is an array, but 
       // will only ever contain one message, so we get index 0
       let webhook_event = entry.messaging[0];
+      // console.log(webhook_event);
+
       let sender_psid = webhook_event['sender']['id'];
       let message = webhook_event['message']['text'];
       console.log('Message received from sender ' + sender_psid + ' : ' + message);
       
-      let response = processMessage(message);
+      let nlp = webhook_event['message']['nlp'];
+
+      let response = processMessage(message, nlp);
       callSendAPI(sender_psid, response);
     });
     
@@ -116,33 +120,77 @@ function getResponseFromMessage(message) {
   return response;
 }
 
+function getDefaultResponse() {
+  return getResponseFromMessage("We could not understand your message. Kindly rephrase your message and send us again.");
+}
+
 // Processes and sends text message
-function processMessage(message) {
+function processMessage(message, nlp) {
   
-  message = message.toLowerCase();
+  if (nlp['intents'].length === 0) {
+    
+    // Check if greeting
+    let traits = nlp['traits'];
+
+    if (traits['wit$greetings'] && traits['wit$greetings'][0]['value'] === 'true') {
+      console.log('Is greeting');
+      return getResponseFromMessage('Hi there! Welcome to Bright. How can I help you?');
+    }
+    
+    console.log('Returning default response');
+    return getDefaultResponse();
+  }
+
+  console.log('Intents inferred from NLP model: ')
+  console.table(nlp['intents']);
+
+  // Get the intent with the highest confidence
+  let intent = nlp['intents'][0]['name']
+  let confidence = nlp['intents'][0]['confidence']
+
+  // If confidence of intent is less than threshold, do not process
+  if (confidence < 0.7) return getDefaultResponse();
+
+  switch (intent) {
+    case 'enquiry_general':
+      let entities = nlp['entities'];
+
+      // Get entity with highest confidence
+      let entity = null;
+      let highest_confidence = 0;
+      for (const e in entities) {
+        let confidence = entities[e][0]['confidence'];
+        if (confidence > highest_confidence) {
+          highest_confidence = confidence;
+          entity = entities[e][0]['name'];
+        }
+      }
+
+      console.log('Entity with highest confidence: ' + entity);
+
+      return handleGeneralEnquiry(entity);
+    default:
+      return getDefaultResponse();
+  }
+
+}
+
+function handleGeneralEnquiry(entity) {
+
+  if (entity == null) return getDefaultResponse();
 
   let responses = {
-    hi: "Hi there! Welcome to Bright. How can I help you?",
-    bright: "Bright is a social enterprise where we provide vocational training to adults with intellectual disabilities.\n\n" +
+    organisation: "Bright is a social enterprise where we provide vocational training to adults with intellectual disabilities.\n\n" +
         "We started a range of social enterprise projects to provide alternative work engagement opportunities for our adult trainees. " + 
         "Some of the projects began as therapy programmes which encourage the development of fine motor skills; others provide a realistic vocational training environment.\n\n" +
         "All net revenue earned from the sale of our products and services go towards paying a monthly allowance for our clients' work, as well as their lunch expenses while undergoing training.",
-    proceeds:
+    profit:
         "All net revenue earned from the sale of our products and services go towards paying a monthly allowance for our clients' work, as well as their lunch expenses while undergoing training.",
-    support:
+    manufacturer:
         "We support adults with intellectual disabilities. We started a range of social enterprise projects to provide alternative work engagement for our adult trainees.",
-    sell: "We sell craft and baker goods.\nLike our Facebook page http://fb.me/brightsocialsg to stay updated!",
-    safe: "Our cookies are made by our clients in a clean and sanitised environment. The cookies are safe to consume before the expiry date that is printed on the packaging."
+    products: "We sell craft and baker goods.\nLike our Facebook page http://fb.me/brightsocialsg to stay updated!",
+    safety: "Our cookies are made by our clients in a clean and sanitised environment. The cookies are safe to consume before the expiry date that is printed on the packaging."
   };
-
-  for (const key in responses) {
-    if (message.includes(key)) {
-      return getResponseFromMessage(responses[key]);
-      break;
-    }
-  }
-
-  // Message does not match any keyword, send default response
-  return getResponseFromMessage("We could not understand your message. Kindly rephrase your message and send us again.");
-
+  
+  return getResponseFromMessage(responses[entity]);
 }
