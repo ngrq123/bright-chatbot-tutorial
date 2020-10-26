@@ -672,7 +672,7 @@ function generateCarouselOfProductsResponse(products) {
           return {
             title: p['title'],
             subtitle: subtitle,
-            // image_url: p['image_link'],
+            image_url: p['image_link'],
             buttons: [
               {
                 type: "postback",
@@ -720,6 +720,8 @@ function processMessage(message, nlp) {
 ```
 
 To process the recommendation intent, we queried the database for all products and passed it into the new `generateCarouselOfProductsResponse` function.
+
+![](images/recommendations.png)
 
 ## Adding to Cart
 
@@ -781,6 +783,8 @@ function processPayload(payload) {
 
 }
 ```
+
+![](images/cart_add.png)
 
 ### Following Up with Quick Replies
 
@@ -874,7 +878,7 @@ function generateCartResponse(cart) {
           return {
             title: p['title'],
             subtitle: subtitle,
-            // image_url: p['image_link'],
+            image_url: p['image_link'],
             buttons: [
               {
                 type: "postback",
@@ -898,9 +902,13 @@ function generateCartResponse(cart) {
 
 > For practice, try modifying how the `recommendation` intent is handled in `processPayload` by removing products that are in the user's cart!
 
+![](images/quick_replies.png)
+
 ## Checkout
 
 ### Mocking Payment with Button Template
+
+Continuing the ordering process, the user eventually checks out his cart. The `payload` in the previous section introduced the `checkout` intent, which is implemented as follows:
 
 ```js
 case 'checkout':
@@ -910,6 +918,8 @@ case 'checkout':
 
   return generateCheckoutResponse(order);
 ```
+
+We then create a new `generateCheckoutResponse` function to take in an `order` to calculate the total amount, and ask for the user to pay with a **button template**.
 
 ```js
 function generateCheckoutResponse(order) {
@@ -924,7 +934,7 @@ function generateCheckoutResponse(order) {
         buttons: [
           {
             type: "postback",
-            title: "Proceed to Pay",
+            title: "Proceed to pay",
             payload: "paid"
           }
         ]
@@ -935,7 +945,11 @@ function generateCheckoutResponse(order) {
 }
 ```
 
+![](images/checkout.png)
+
 ### Issuing a Receipt with the Receipt Template
+
+After the user clicks/taps on **Proceed to pay**, a receipt will be generated with the **receipt template**, implemented with the `generateReceiptTemplate` function.
 
 ```js
 case 'paid':
@@ -979,7 +993,7 @@ function generateReceiptResponse(order) {
             quantity: product["quantity"],
             price: product["price"]*product["quantity"],
             currency: "SGD",
-            // image_url: product["image_link"]
+            image_url: product["image_link"]
           };
         })
       }
@@ -987,6 +1001,12 @@ function generateReceiptResponse(order) {
   };
 }
 ```
+
+![](images/confirmation_order.png)
+
+When clicked, the receipt expands:
+
+![](images/receipt.png)
 
 ## Challenge 1: Order Enquiry
 

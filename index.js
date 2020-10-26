@@ -23,14 +23,14 @@ let products = [
     title: 'Chocolate Chip Cookies',
     pattern: 'Box of 6',
     price: 15.5,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/chocolate_chip_cookies.jpg'
   },
   {
     pid: 123,
     title: 'Earl Grey Sunflower Seeds Cookies',
     pattern: 'Box of 9',
     price: 18.5,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/earl_grey_sunflower_seeds_cookies.jpg'
   }
 ]
 
@@ -53,22 +53,7 @@ let cart = [
   }
 ]
 
-let order = [
-  {
-    pid: 123,
-    title: 'Earl Grey Sunflower Seeds Cookies',
-    pattern: 'Box of 6',
-    price: 15.5,
-    quantity: 1
-  },
-  {
-    pid: 123,
-    title: 'Earl Grey Sunflower Seeds Cookies',
-    pattern: 'Box of 9',
-    price: 18.5,
-    quantity: 2
-  }
-]
+let order = cart;
 /*
   End of mock data in database (remove if database is implemented)
 */
@@ -290,7 +275,7 @@ function generateCarouselOfProductsResponse(products) {
           return {
             title: p['title'],
             subtitle: subtitle,
-            // image_url: p['image_link'],
+            image_url: p['image_link'],
             buttons: [
               {
                 type: "postback",
@@ -343,7 +328,7 @@ function processPayload(payload) {
     case 'paid':
       // Get latest order from database
 
-      return generateReceiptResponse(paid_order);
+      return generateReceiptResponse(order);
     default:
       return getDefaultResponse();
   }
@@ -390,7 +375,7 @@ function generateCartResponse(cart) {
           return {
             title: p['title'],
             subtitle: subtitle,
-            // image_url: p['image_link'],
+            image_url: p['image_link'],
             buttons: [
               {
                 type: "postback",
@@ -467,7 +452,7 @@ function generateReceiptResponse(order) {
             quantity: product["quantity"],
             price: product["price"]*product["quantity"],
             currency: "SGD",
-            // image_url: product["image_link"]
+            image_url: product["image_link"]
           };
         })
       }
