@@ -865,11 +865,21 @@ function generateCartResponse(cart) {
 
 ## Checkout
 
+## Challenge: Order Enquiry and Tracking
+
 ## Challenge: Implement Product Enquiries
+
+In the [Introduction to Templates](#introduction-to-templates) section, each generic template element in the carousel has a "Learn more" button that has the payload `enquiry_product <product_name>`. For example, a user can enquire about the number of cookies in a box, or the number of variants a product has.
+
+Implement the `enquiry_product` intent in the `processPayload` function. You might need to collect enough details of the product that the user is enquiring in order to provide an answer.
+
+> Hint: One way to do so is to keep adding onto the payload (e.g. `enquiry_product <product_name> <product_variant> <attribute>`). Or, you could also store the postback parts in the database as a new collection/table.
+
+## Wrapping Up
 
 ## Acknowledgements
 
-Special shoutout to Douglas Sim and Jelissa Ong, who helped build the Bright Social Enterprise Commerce Bot in the previous Messenger hackathon, and agreeing to allow us to use Bright chatbot as a solution for this hackathon!
+Special shoutout to Douglas Sim and Jelissa Ong, who helped to build the Bright Social Enterprise Commerce Bot in the previous Messenger hackathon, and agreeing to allow us to use Bright chatbot as a solution for this hackathon!
 
 ## References
 
