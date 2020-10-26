@@ -352,7 +352,7 @@ Congratulations, you’ve now made your first `Wit.ai` application.
 
 ![](images/4_3.jpg)
 
-On the left side, you will see three tabs titled **Understanding**, **Management** and **Insights**. Let’s start by training out chatbot on the Understanding tab.
+On the left side, you will see three tabs titled **Understanding**, **Management** and **Insights**. Let’s start by training out chatbot on the **Understanding** tab.
 
 ### Example of a Built-in Trait
 
