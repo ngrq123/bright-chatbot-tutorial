@@ -2,6 +2,12 @@
 
 ## Introduction
 
+Chatbots today are the face of customer services across many businesses as it is a form of automation that allows them to free up manpower for other operations. NGOs can greatly benefit through these areas and our team felt that it is possible to help alleviate their lack of manpower through this technology.
+
+Also, during this period, many of us find ourselves browsing online stores to purchase our daily necessities. Therefore, chatbots have also found themselves relevant in this trend to create immersive chat experiences in online commerce businesses. Some users will want to have human-like interactions in their shopping experiences - and that is enabled through the use of a chatbot.
+
+We felt that this use case would be a good example to showcase the functionalities of a Messenger chatbot and introduce budding chatbot developers to learn how to get started on their own messaging commerce platforms using their Facebook Pages and `Wit.ai`.
+
 ## Pre-Requisites
 
 The following subsections list the background knowledge and how to get started prior to creating a chatbot.
@@ -1023,6 +1029,19 @@ Implement the `enquiry_product` intent in the `processPayload` function. You mig
 > Hint: One way to do so is to keep adding onto the payload (e.g. `enquiry_product <product_name> <product_variant> <attribute>`). Or, you could also store the postback parts in the database as a new collection/table.
 
 ## Wrapping Up
+
+In this tutorial, you have learnt to build a commerce chatbot that answers general enquiries, provides recommendations, and provides a seemless order process to users. You have set up the entire technology stack: Facebook page, Facebook for Developer App, `Wit.ai` model, MongoDB database and Express.js application that includes a webhook that listens for incoming events.
+
+We explored some of the many features of Messenger, including templates and quick replies, and went through the differences between message and postback events.
+
+Additionally, you have seen how NLP is used in chatbots, converting unstructured text into categories - allowing us to create a smarter Messenger chatbot that elevates the Messenger experience.
+
+An NLP engine integrated with Facebook messenger has many potential use cases and opportunity for reusability.
+
+For example, a CSR-supportive use case could be Community Service Volunteer Recruitment. A person who wants to volunteer messages the Chatbot with their availability for the week and the chatbot returns a list of organisations that need volunteers on those days. The volunteer selects an organisation from the list and reads up on what type of roles are required. The volunteer selects a role and a time that they are able to attend. Organisation has gained a volunteer through the chatbot!
+
+For a more business-minded and advice-reliant use case, let’s refer to an Over-The-Counter e-Pharmacy example. Someone at home has mild symptoms such as a headache and doesn’t want to travel to a pharmacy. The would-be customer messages the chatbot with their symptoms. The chatbot which is only allowed to advise on utterances with a high level of confidence, advises the customer to buy paracetamol. The customer then has the option to buy paracetamol with the click of a button for home delivery.
+
 
 ## Acknowledgements
 
