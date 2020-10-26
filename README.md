@@ -336,7 +336,7 @@ Now, whenever your message includes any of those keywords in the `responses` obj
 
 ## Introduction to `Wit.ai` Natural Language Processing (NLP)
 
-Wit.ai is a NLP service that provides a user-friendly interface that facilitates easy training of your Facebook Messenger chatbot. Using Wit.ai’s own NLP engine, Wit.ai is essentially used to build the “brain” of Bright chatbot.
+Wit.ai is a NLP service that provides a user-friendly interface to facilitate training your Facebook Messenger chatbot. Using its own NLP engine, Wit.ai is essentially used to build the “brain” of Bright chatbot.
 
 ### Creating a Customised `Wit.ai` Application
 
@@ -344,7 +344,7 @@ Sign in to Wit.ai using Facebook and click on **New App**.
 
 ![](images/4_1.jpg)
 
-Let us name our application **BrightChatbot** and make its visibility **Private**. Click on **Create**. 
+Let's name our application **BrightChatbot** and make its visibility **Private**. Click on **Create**. 
 
 ![](images/4_2.jpg)
 
@@ -352,7 +352,7 @@ Congratulations, you’ve now made your first `Wit.ai` application.
 
 ![](images/4_3.jpg)
 
-You will see three side tabs titled Understanding, Management and Insights. Let’s start by training out chatbot on the Understanding tab.
+On the left side, you will see three tabs titled 'Understanding', 'Management' and 'Insights'. Let’s start by training out chatbot on the Understanding tab.
 
 ### Example of a Built-in Trait
 
