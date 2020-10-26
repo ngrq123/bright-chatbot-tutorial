@@ -109,7 +109,7 @@ app.get('/', (req, res) => {
 
 6. Let us now create a `GET` request `/webhook` endpoint for your Facebook for Developers App to verify the webhook. We suggest adding your verification token in a `.env` file.
 
-```
+```js
 // Adds support for GET requests to our webhook
 app.get('/webhook', (req, res) => {
   
@@ -574,6 +574,72 @@ Also, notice how the greeting is handled differently? By utilising `Wit.ai`'s bu
 
 ## Creating a Business Database
 
+```js
+// Sets server port and logs message on success
+const listener = app.listen(process.env.PORT || 1337, () => console.log('webhook is listening on port ' + listener.address().port));
+
+/*
+  Mock data in database (remove if database is implemented)
+*/
+let products = [
+  {
+    pid: 123,
+    title: 'Chocolate Chip Cookies',
+    pattern: 'Box of 6',
+    price: 15.5,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+  },
+  {
+    pid: 456,
+    title: 'Earl Grey Sunflower Seeds Cookies',
+    pattern: 'Box of 9',
+    price: 18.5,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+  }
+]
+
+let cart = [
+  {
+    pid: 123,
+    title: 'Chocolate Chip Cookies',
+    pattern: 'Box of 6',
+    price: 15.5,
+    quantity: 1,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+  },
+  {
+    pid: 456,
+    title: 'Earl Grey Sunflower Seeds Cookies',
+    pattern: 'Box of 9',
+    price: 18.5,
+    quantity: 2,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+  }
+]
+
+let order = [
+  {
+    pid: 123,
+    title: 'Chocolate Chip Cookies',
+    pattern: 'Box of 6',
+    price: 15.5,
+    quantity: 1,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+  },
+  {
+    pid: 456,
+    title: 'Earl Grey Sunflower Seeds Cookies',
+    pattern: 'Box of 9',
+    price: 18.5,
+    quantity: 2,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+  }
+]
+/*
+  End of mock data in database (remove if database is implemented)
+*/
+```
+
 ## Solution Overview
 
 The simplified technology stack as follows:
@@ -643,21 +709,7 @@ function processMessage(message, nlp) {
 
     case 'recommendation':
       // Get products from database
-      let products = [
-        {
-          pid: 123,
-          title: 'Cookies 1',
-          pattern: 'Box of 6',
-          price: 15.5
-        },
-        {
-          pid: 123,
-          title: 'Cookies 2',
-          pattern: 'Box of 9',
-          price: 18.5
-        }
-      ]
-
+      
       return generateCarouselOfProductsResponse(products);
 
     default:
@@ -796,40 +848,10 @@ Lastly, implement `recommendations` and `cart_view` intents in the `processPaylo
 ```js
 case 'recommendation':
   // Get products from database
-  let products = [
-    {
-      pid: 123,
-      title: 'Earl Grey Sunflower Seeds Cookies',
-      pattern: 'Box of 6',
-      price: 15.5
-    },
-    {
-      pid: 123,
-      title: 'Earl Grey Sunflower Seeds Cookies',
-      pattern: 'Box of 9',
-      price: 18.5
-    }
-  ]
   
   return generateCarouselOfProductsResponse(products);
 case 'cart_view':
   // Get cart from database
-  let cart = [
-    {
-      pid: 123,
-      title: 'Earl Grey Sunflower Seeds Cookies',
-      pattern: 'Box of 6',
-      price: 15.5,
-      quantity: 1
-    },
-    {
-      pid: 123,
-      title: 'Earl Grey Sunflower Seeds Cookies',
-      pattern: 'Box of 9',
-      price: 18.5,
-      quantity: 2
-    }
-  ]
 
   return generateCartResponse(cart);
 ```
@@ -882,23 +904,7 @@ function generateCartResponse(cart) {
 
 ```js
 case 'checkout':
-  // Get cart from database
-  let order = [
-    {
-      pid: 123,
-      title: 'Earl Grey Sunflower Seeds Cookies',
-      pattern: 'Box of 6',
-      price: 15.5,
-      quantity: 1
-    },
-    {
-      pid: 123,
-      title: 'Earl Grey Sunflower Seeds Cookies',
-      pattern: 'Box of 9',
-      price: 18.5,
-      quantity: 2
-    }
-  ]
+  // Get order from database
 
   // Add to order and delete cart
 
@@ -934,24 +940,8 @@ function generateCheckoutResponse(order) {
 ```js
 case 'paid':
   // Get latest order from database
-  let paid_order = [
-    {
-      pid: 123,
-      title: 'Earl Grey Sunflower Seeds Cookies',
-      pattern: 'Box of 6',
-      price: 15.5,
-      quantity: 1
-    },
-    {
-      pid: 123,
-      title: 'Earl Grey Sunflower Seeds Cookies',
-      pattern: 'Box of 9',
-      price: 18.5,
-      quantity: 2
-    }
-  ]
 
-  return generateReceiptResponse(paid_order);
+  return generateReceiptResponse(order);
 ```
 
 ```js

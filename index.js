@@ -14,6 +14,65 @@ const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 // Sets server port and logs message on success
 const listener = app.listen(process.env.PORT || 1337, () => console.log('webhook is listening on port ' + listener.address().port));
 
+/*
+  Mock data in database (remove if database is implemented)
+*/
+let products = [
+  {
+    pid: 123,
+    title: 'Chocolate Chip Cookies',
+    pattern: 'Box of 6',
+    price: 15.5,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+  },
+  {
+    pid: 123,
+    title: 'Earl Grey Sunflower Seeds Cookies',
+    pattern: 'Box of 9',
+    price: 18.5,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+  }
+]
+
+let cart = [
+  {
+    pid: 123,
+    title: 'Chocolate Chip Cookies',
+    pattern: 'Box of 6',
+    price: 15.5,
+    quantity: 1,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+  },
+  {
+    pid: 456,
+    title: 'Earl Grey Sunflower Seeds Cookies',
+    pattern: 'Box of 9',
+    price: 18.5,
+    quantity: 2,
+    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+  }
+]
+
+let order = [
+  {
+    pid: 123,
+    title: 'Earl Grey Sunflower Seeds Cookies',
+    pattern: 'Box of 6',
+    price: 15.5,
+    quantity: 1
+  },
+  {
+    pid: 123,
+    title: 'Earl Grey Sunflower Seeds Cookies',
+    pattern: 'Box of 9',
+    price: 18.5,
+    quantity: 2
+  }
+]
+/*
+  End of mock data in database (remove if database is implemented)
+*/
+
 app.get('/', (req, res) => {
   res.status(200).send('You are connected to the chatbot application.');
 })
@@ -185,20 +244,6 @@ function processMessage(message, nlp) {
       return handleGeneralEnquiry(entity);
     case 'recommendation':
       // Get products from database
-      let products = [
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 6',
-          price: 15.5
-        },
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 9',
-          price: 18.5
-        }
-      ]
 
       return generateCarouselOfProductsResponse(products);
 
@@ -283,82 +328,20 @@ function processPayload(payload) {
       return generateAddCartQuickRepliesResponse('Added ' + quantity + ' ' + product_name + ' to cart.');
     case 'recommendation':
       // Get products from database
-      let products = [
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 6',
-          price: 15.5
-        },
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 9',
-          price: 18.5
-        }
-      ]
 
       return generateCarouselOfProductsResponse(products);
     case 'cart_view':
       // Get cart from database
-      let cart = [
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 6',
-          price: 15.5,
-          quantity: 1
-        },
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 9',
-          price: 18.5,
-          quantity: 2
-        }
-      ]
 
       return generateCartResponse(cart);
     case 'checkout':
       // Get cart from database
-      let order = [
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 6',
-          price: 15.5,
-          quantity: 1
-        },
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 9',
-          price: 18.5,
-          quantity: 2
-        }
-      ]
 
       // Add to order and delete cart
 
       return generateCheckoutResponse(order);
     case 'paid':
       // Get latest order from database
-      let paid_order = [
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 6',
-          price: 15.5,
-          quantity: 1
-        },
-        {
-          pid: 123,
-          title: 'Earl Grey Sunflower Seeds Cookies',
-          pattern: 'Box of 9',
-          price: 18.5,
-          quantity: 2
-        }
-      ]
 
       return generateReceiptResponse(paid_order);
     default:
