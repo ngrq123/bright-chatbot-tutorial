@@ -1112,7 +1112,17 @@ Special shoutout to Douglas Sim and Jelissa Ong, who helped to build the Bright 
 
 ## References
 
+- Bright Social Enterprise E-Commerce Chatbot: https://github.com/ngrq123/bright-social-enterprise-commerce-bot
+- Built-In Entities and Traits: https://wit.ai/docs/built-in-entities/20200513/
+- Button Template: https://developers.facebook.com/docs/messenger-platform/send-messages/template/button
+- How do I create a Facebook Page?: https://www.facebook.com/business/help/104002523024878
+- Mongoose Getting Started: https://mongoosejs.com/docs/index.html
+- Natural Language Processing: https://developers.facebook.com/docs/messenger-platform/built-in-nlp
 - Postback Button: https://developers.facebook.com/docs/messenger-platform/reference/buttons/postback
 - Quick Replies: https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies/
+- Receipt Template: https://developers.facebook.com/docs/messenger-platform/send-messages/template/receipt
 - Send API: https://developers.facebook.com/docs/messenger-platform/reference/send-api/
 - Send Messages: https://developers.facebook.com/docs/messenger-platform/send-messages/
+- Setting Up Your Facebook App: https://developers.facebook.com/docs/messenger-platform/getting-started/app-setup
+- Setting Up Your Webhook: https://developers.facebook.com/docs/messenger-platform/getting-started/webhook-setup
+- `Wit.ai` Recipes: https://wit.ai/docs/recipes
