@@ -578,7 +578,71 @@ Also, notice how the greeting is handled differently? By utilising `Wit.ai`'s bu
 
 ![](images/pretrained_greetings.png)
 
-## Creating a Business Database
+## Optional: Creating a Business Database
+
+> This section is optional: Mock data (found at the end of this section) can be inserted at the top of `index.js` for chatbot development.
+
+It is imperative that if you want to build a e-commerce platform, you would need a database to maintain certain details like processing of payments and tracking of delivery status of your products. Here, we are going to give a brief overview on how to create and connect your webhook application to **MongoDB**, a NoSQL Database.
+
+For the database, we will be using **mlabs**, a MongoDB Hosting, Database-as-a-service for MongoDB. After signing up with you email at https://mlab.com/, select your cluster and relevant service as seen in the picture below.
+
+![](images/db_1.jpg)
+
+Next, click on **connect** when the database is created, add the ip address of where your server will be, or even your own local ip address for local development. Also, create a user for you to use to connect to your mlabs database in your application.
+
+![](images/db_2.jpg)
+
+Select **Connect Your Application**, then copy and replace the respective fields (your username and password) in your code.
+
+![](images/db_3.jpg)
+
+![](images/db_4.jpg)
+
+Now onto the code! In your `index.js` file, include the following:
+
+```js
+// Setup to connect to DB
+const DB_PASSWORD = process.env.DB_PASSWORD;
+mongoose.connect('mongodb+srv://mongoadmin:' + DB_PASSWORD + '@fb-hack-chatbot-cevnk.mongodb.net/fbmsg', { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false }).then(() => console.log("DB Connection successful"));
+mongoose.Promise = global.Promise;
+```
+
+This is to setup and allow you to connect to the database that is hosted on mlabs. Next, include the model files that you are going to use in your application.
+
+```js
+//Import Schema
+require('./models/User');
+require('./models/Product');
+require('./models/Cart');
+require('./models/Order');
+```
+
+The model files are all provided in the `models` folder. Their corresponding schemas can be found in these files. Here is an example on how to the schema is written:
+
+```js
+const orderSchema = new mongoose.Schema({
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    trackingNumber: { type: String, unique: true },
+    orderStatus: {
+        type: String,
+        enum : ['Order Received','Packing','Out For Delivery','Delivered','Refund'],
+        default: 'Order Received'
+    },
+    products : [{
+        title:String,
+        price:Float,
+        image_link:String,
+        pattern:String,
+        quantity:Float
+    }]
+}, { timestamps: true });
+```
+
+The **key** in the schema object is the name of the column, and **value** is the database type that you want your column to be in the database. Here we are using **mongoose** as a library and you can see the [documentation](https://mongoosejs.com/docs/) to learn how to perform CRUD operations in Node.js.
+
+An advantage on using MongoDB is that you would not have to create the collections, as the database system will automatically create them when we the first set of data (called document) is inserted into the database.
+
+**Mock Commerce Data**
 
 ```js
 // Sets server port and logs message on success
@@ -1041,7 +1105,6 @@ An NLP engine integrated with Facebook messenger has many potential use cases an
 For example, a CSR-supportive use case could be Community Service Volunteer Recruitment. A person who wants to volunteer messages the Chatbot with their availability for the week and the chatbot returns a list of organisations that need volunteers on those days. The volunteer selects an organisation from the list and reads up on what type of roles are required. The volunteer selects a role and a time that they are able to attend. Organisation has gained a volunteer through the chatbot!
 
 For a more business-minded and advice-reliant use case, let’s refer to an Over-The-Counter e-Pharmacy example. Someone at home has mild symptoms such as a headache and doesn’t want to travel to a pharmacy. The would-be customer messages the chatbot with their symptoms. The chatbot which is only allowed to advise on utterances with a high level of confidence, advises the customer to buy paracetamol. The customer then has the option to buy paracetamol with the click of a button for home delivery.
-
 
 ## Acknowledgements
 
