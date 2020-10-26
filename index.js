@@ -319,6 +319,48 @@ function processPayload(payload) {
       ]
 
       return generateCartResponse(cart);
+    case 'checkout':
+      // Get cart from database
+      let order = [
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 6',
+          price: 15.5,
+          quantity: 1
+        },
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 9',
+          price: 18.5,
+          quantity: 2
+        }
+      ]
+
+      // Add to order and delete cart
+
+      return generateCheckoutResponse(order);
+    case 'paid':
+      // Get latest order from database
+      let paid_order = [
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 6',
+          price: 15.5,
+          quantity: 1
+        },
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 9',
+          price: 18.5,
+          quantity: 2
+        }
+      ]
+
+      return generateReceiptResponse(paid_order);
     default:
       return getDefaultResponse();
   }
@@ -384,4 +426,68 @@ function generateCartResponse(cart) {
     }
   }
 
+}
+
+function generateCheckoutResponse(order) {
+  let total_price = order.reduce((acc, p) => acc + p['price'] * p['quantity'], 0);
+
+  return {
+    attachment: {
+      type: "template",
+      payload: {
+        template_type: "button",
+        text: `Your order (including shipping) will be $${(total_price + 5).toFixed(2)}.\n\nYou will be contributing to ${Math.ceil(total_price / 5)} meals for our beneficiaries.`,
+        buttons: [
+          {
+            type: "postback",
+            title: "Proceed to Pay",
+            payload: "paid"
+          }
+        ]
+      }
+    }
+  }
+
+}
+
+function generateReceiptResponse(order) {
+  let total_price = order.reduce((acc, p) => acc + p['price'] * p['quantity'], 0);
+
+  return {
+    attachment: {
+      type: "template",
+      payload: {
+        template_type: "receipt",
+        recipient_name: "John Doe",
+        order_number: "bf23ad46d123",
+        currency: "SGD",
+        payment_method: "PayPal",
+        order_url: "",
+        address: {
+          street_1: "9 Straits View",
+          city: "Singapore",
+          postal_code: "018937",
+          state: "SG",
+          country: "SG"
+        },
+        summary: {
+          subtotal: total_price.toFixed(2),
+          shipping_cost: 5,
+          total_tax: ((total_price+5)*0.07).toFixed(2),
+          total_cost: (total_price+5).toFixed(2)
+        },
+        elements: order.map(product => {
+          return {
+            title: `${product["name"]}`,
+            title: product["title"],
+            subtitle: product["pattern"],
+            quantity: product["quantity"],
+            price: product["price"]*product["quantity"],
+            currency: "SGD",
+            // image_url: product["image_link"]
+          };
+        })
+      }
+    }
+  };
 }

@@ -1,4 +1,4 @@
-# Learn to Create Messenger Experiences with Bright Commerce Chatbot
+# Create Smarter Messenger Experiences on Facebook with Bright Commerce Chatbot
 
 ## Introduction
 
@@ -576,6 +576,10 @@ Also, notice how the greeting is handled differently? By utilising `Wit.ai`'s bu
 
 ## Solution Overview
 
+The simplified technology stack as follows:
+
+![](images/architecture_diagram.png)
+
 ## Listing Products
 
 ### Introduction to Templates
@@ -671,7 +675,16 @@ To process the recommendation intent, we queried the database for all products a
 
 Postbacks are buttons with a `payload`, and a **postback event** is triggered when users interact with postback buttons. In order to retrieve the content of a postback, we will access the `postback` attribute of the `webhook_event` object.
 
-In the postback object, there are two attributes: `title` and `payload`, which are both defined in the **postback button** object. 
+In the `postback` object, there are two attributes: `title` and `payload`, which are both defined in the **postback button** object. 
+
+Here is an example:
+
+```js
+{ 
+  title: 'Add to cart',
+  payload: 'cart_add 1 123 Earl Grey Sunflower Seeds Cookies' 
+}
+```
 
 To process the postback, the `webhook_event` handling needs to be modified in the POST request to the callback URL.
 
@@ -865,9 +878,133 @@ function generateCartResponse(cart) {
 
 ## Checkout
 
-## Challenge: Order Enquiry and Tracking
+### Mocking Payment with Button Template
 
-## Challenge: Implement Product Enquiries
+```js
+case 'checkout':
+  // Get cart from database
+  let order = [
+    {
+      pid: 123,
+      title: 'Earl Grey Sunflower Seeds Cookies',
+      pattern: 'Box of 6',
+      price: 15.5,
+      quantity: 1
+    },
+    {
+      pid: 123,
+      title: 'Earl Grey Sunflower Seeds Cookies',
+      pattern: 'Box of 9',
+      price: 18.5,
+      quantity: 2
+    }
+  ]
+
+  // Add to order and delete cart
+
+  return generateCheckoutResponse(order);
+```
+
+```js
+function generateCheckoutResponse(order) {
+  let total_price = order.reduce((acc, p) => acc + p['price'] * p['quantity'], 0);
+
+  return {
+    attachment: {
+      type: "template",
+      payload: {
+        template_type: "button",
+        text: `Your order (including shipping) will be $${(total_price + 5).toFixed(2)}.\n\nYou will be contributing to ${Math.ceil(total_price / 5)} meals for our beneficiaries.`,
+        buttons: [
+          {
+            type: "postback",
+            title: "Proceed to Pay",
+            payload: "paid"
+          }
+        ]
+      }
+    }
+  }
+  
+}
+```
+
+### Issuing a Receipt with the Receipt Template
+
+```js
+case 'paid':
+  // Get latest order from database
+  let paid_order = [
+    {
+      pid: 123,
+      title: 'Earl Grey Sunflower Seeds Cookies',
+      pattern: 'Box of 6',
+      price: 15.5,
+      quantity: 1
+    },
+    {
+      pid: 123,
+      title: 'Earl Grey Sunflower Seeds Cookies',
+      pattern: 'Box of 9',
+      price: 18.5,
+      quantity: 2
+    }
+  ]
+
+  return generateReceiptResponse(paid_order);
+```
+
+```js
+function generateReceiptResponse(order) {
+  let total_price = order.reduce((acc, p) => acc + p['price'] * p['quantity'], 0);
+
+  return {
+    attachment: {
+      type: "template",
+      payload: {
+        template_type: "receipt",
+        recipient_name: "John Doe",
+        order_number: "bf23ad46d123",
+        currency: "SGD",
+        payment_method: "PayPal",
+        order_url: "",
+        address: {
+          street_1: "9 Straits View",
+          city: "Singapore",
+          postal_code: "018937",
+          state: "SG",
+          country: "SG"
+        },
+        summary: {
+          subtotal: total_price.toFixed(2),
+          shipping_cost: 5,
+          total_tax: ((total_price+5)*0.07).toFixed(2),
+          total_cost: (total_price+5).toFixed(2)
+        },
+        elements: order.map(product => {
+          return {
+            title: `${product["name"]}`,
+            title: product["title"],
+            subtitle: product["pattern"],
+            quantity: product["quantity"],
+            price: product["price"]*product["quantity"],
+            currency: "SGD",
+            // image_url: product["image_link"]
+          };
+        })
+      }
+    }
+  };
+}
+```
+
+## Challenge 1: Order Enquiry
+
+In the previous section - [Checkout](#checkout) - we created orders for fulfillment. Now, extend the chatbot's functionality by implementing order enquiry in the chatbot, which allows users to enquire on their order status.
+
+> Hint: Train some utterances with a new intent (say, `enquiry_order`) and process the message. Then utilise the button template or quick replies to allow users to select the order that they are enquiring.
+
+## Challenge 2: Implement Product Enquiries
 
 In the [Introduction to Templates](#introduction-to-templates) section, each generic template element in the carousel has a "Learn more" button that has the payload `enquiry_product <product_name>`. For example, a user can enquire about the number of cookies in a box, or the number of variants a product has.
 
@@ -885,3 +1022,5 @@ Special shoutout to Douglas Sim and Jelissa Ong, who helped to build the Bright 
 
 - Postback Button: https://developers.facebook.com/docs/messenger-platform/reference/buttons/postback
 - Quick Replies: https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies/
+- Send API: https://developers.facebook.com/docs/messenger-platform/reference/send-api/
+- Send Messages: https://developers.facebook.com/docs/messenger-platform/send-messages/
