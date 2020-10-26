@@ -60,15 +60,27 @@ app.post('/webhook', (req, res) => {
       // Gets the message. entry.messaging is an array, but 
       // will only ever contain one message, so we get index 0
       let webhook_event = entry.messaging[0];
-      // console.log(webhook_event);
+      console.log(webhook_event);
 
       let sender_psid = webhook_event['sender']['id'];
-      let message = webhook_event['message']['text'];
-      console.log('Message received from sender ' + sender_psid + ' : ' + message);
-      
-      let nlp = webhook_event['message']['nlp'];
 
-      let response = processMessage(message, nlp);
+      let response = getDefaultResponse();
+      if (webhook_event['message']) {
+        let message = webhook_event['message']['text'];
+        console.log('Message received from sender ' + sender_psid + ' : ' + message);
+        
+        if (webhook_event['message']['quick_reply']) {
+          let payload = webhook_event['message']['quick_reply']['payload'];
+          response = processPayload(payload);
+        } else {
+          let nlp = webhook_event['message']['nlp'];
+          response = processMessage(message, nlp);
+        }
+      } else if (webhook_event['postback']) {
+        let payload = webhook_event['postback']['payload'];
+        response = processPayload(payload);
+      }
+      
       callSendAPI(sender_psid, response);
     });
     
@@ -225,9 +237,9 @@ function generateCarouselOfProductsResponse(products) {
         "template_type": "generic",
         "elements":
         products.map(p => {
-          let subtitle = p['price'].toFixed(2);
+          let subtitle = '$' + p['price'].toFixed(2);
           if (p['pattern']) {
-            subtitle = '(' + p['pattern'] + ') $' + subtitle;
+            subtitle = '(' + p['pattern'] + ') ' + subtitle;
           }
 
           return {
@@ -237,13 +249,133 @@ function generateCarouselOfProductsResponse(products) {
             buttons: [
               {
                 type: "postback",
-                title: "Learn More",
+                title: "Learn more",
                 payload: `enquiry_product ${p['title']}`
               }, 
               {
                 type: "postback",
-                title: `Add to Cart`,
-                payload: `cart_add ${p['pid']}`
+                title: `Add to cart`,
+                payload: `cart_add 1 ${p['pid']} ${p['title']}`
+              }
+            ]
+          }
+        })
+      }
+    }
+  }
+
+}
+
+function processPayload(payload) {
+  let payload_parts = payload.split(' ');
+  // console.log(payload_parts);
+  let intent = payload_parts.shift();
+  
+  switch(intent) {
+    case 'cart_add':
+      // Example of payload: cart_add 1 123 Earl Grey Sunflower Seeds Cookies
+      let quantity = payload_parts.shift();
+      let pid = payload_parts.shift();
+      let product_name = payload_parts.join(' ');
+      
+      // Update cart in database
+
+      return generateAddCartQuickRepliesResponse('Added ' + quantity + ' ' + product_name + ' to cart.');
+    case 'recommendation':
+      // Get products from database
+      let products = [
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 6',
+          price: 15.5
+        },
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 9',
+          price: 18.5
+        }
+      ]
+
+      return generateCarouselOfProductsResponse(products);
+    case 'cart_view':
+      // Get cart from database
+      let cart = [
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 6',
+          price: 15.5,
+          quantity: 1
+        },
+        {
+          pid: 123,
+          title: 'Earl Grey Sunflower Seeds Cookies',
+          pattern: 'Box of 9',
+          price: 18.5,
+          quantity: 2
+        }
+      ]
+
+      return generateCartResponse(cart);
+    default:
+      return getDefaultResponse();
+  }
+
+}
+
+function generateAddCartQuickRepliesResponse(message) {
+  return {
+    "text": message,
+    "quick_replies": [
+      {
+        "content_type": "text",
+        "title": "Checkout",
+        "payload": "checkout"
+      },
+      {
+        "content_type": "text",
+        "title": "View more products",
+        "payload": "recommendation"
+      }, {
+        "content_type": "text",
+        "title": 'View cart',
+        "payload": "cart_view"
+      }
+    ]
+  }
+
+}
+
+function generateCartResponse(cart) {
+
+  return {
+    "attachment": {
+      "type": "template",
+      "payload": {
+        "template_type": "generic",
+        "elements":
+        cart.map(p => {
+          let subtitle = 'Qty: ' + p['quantity'] + ' ($' + p['price'].toFixed(2) + ' each)';
+          if (p['pattern']) {
+            subtitle = p['pattern'] + ', ' + subtitle;
+          }
+
+          return {
+            title: p['title'],
+            subtitle: subtitle,
+            // image_url: p['image_link'],
+            buttons: [
+              {
+                type: "postback",
+                title: "Add 1 to Cart",
+                payload: `cart_add 1 ${p['pid']} ${p['title']}`
+              }, 
+              {
+                type: "postback",
+                title: `Remove All`,
+                payload: `cart_remove_all ${p['pid']} ${p['title']}`
               }
             ]
           }

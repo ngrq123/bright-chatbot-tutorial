@@ -87,7 +87,7 @@ Webhooks are API endpoints which you expose, to allow client(s) to connect to. T
 4. Issue the command, `npm install express body-parser --save`, this installs the Express.js http server framework module, and add them as dependencies in your `package.json` file
 5. Create a server that listens for communication at the default port by adding the following code below into your `index.js` file
 
-```
+```js
 'use strict';
  
 // Imports dependencies and set up http server
@@ -141,7 +141,7 @@ app.get('/webhook', (req, res) => {
 
 7. Finally, you can now test your webhook by issuing the curl command (replace the <VERIFY_TOKEN> with your own token that you had specified in the previous step:
 
-```
+```sh
 curl -X GET "localhost:1337/webhook?hub.verify_token=<VERIFY_TOKEN>&hub.challenge=CHALLENGE_ACCEPTED&hub.mode=subscribe"
 ```
 
@@ -173,7 +173,7 @@ Sending messages require the use of Send API via a post request coupled with you
 
 Below is a wrapper function that takes in the sender’s identifier (called Page-scoped ID, or PSID in short) and the response object. This function converts parameters into the standardised data structure and proceeds to send the response.
 
-```
+```js
 // Sends response messages via the Send API
 function callSendAPI(sender_psid, response) {
  
@@ -226,7 +226,8 @@ VERIFY_TOKEN=<verify_token>
 Create a `.gitignore` and add `.env` inside (if you have not). Also, add the variables to [Heroku](https://devcenter.heroku.com/articles/config-vars).  In our script, we the `dotenv` package is used to configure and retrieve the page access token. 
 
 The start of your `index.js` should look like this (remember to add the new dependencies in `package.json` too):
-```
+
+```js
 // Imports dependencies and set up http server
 const
   express = require('express'),
@@ -242,7 +243,7 @@ Once all these components are in place, you’re ready to execute standard respo
 
 We first define a wrapper function `sendMessage` that takes in `sender_psid` and `message` (of string type), converts the string to a response object, then sends the message. This function might seem unnecessary now, but is definitely useful when the scale of the chatbot gets larger.
 
-```
+```js
 // Wrapper method to convert text message string to response object, and sends the message
 function getResponseFromMessage(message) {
   const response = {
@@ -256,7 +257,7 @@ function getResponseFromMessage(message) {
 ### Receiving and Sending Back the Same Message
 We will first start by responding to the same message as what the user sent.
 
-```
+```js
 // Creates the endpoint for our webhook 
 app.post('/webhook', (req, res) => {  
   
@@ -299,7 +300,7 @@ Now let us implement some standard reponses. First, replace `sendMessage` with a
 
 The `processMessage` function encapsulates the implementation of the standard responses.
 
-```
+```js
 function processMessage(message) {
   
   message = message.toLowerCase();
@@ -471,7 +472,7 @@ We will now train the messages that we have handled with the standard responses 
 
 Let us modify our post request function to retrieve the NLP model output and pass it in as a new, second argument in `processMessage`.
 
-```
+```js
 console.log('Message received from sender ' + sender_psid + ' : ' + message);
 
 let nlp = webhook_event['message']['nlp'];
@@ -490,7 +491,7 @@ function getDefaultResponse() {
 
 We will then modify the processMessage function, and abstracting the general enquiry handling into another function `handleGeneralEnquiry`.
 
-```
+```js
 // Processes and sends text message
 function processMessage(message, nlp) {
   
@@ -545,7 +546,7 @@ function processMessage(message, nlp) {
 
 We set a arbitrary confidence threshold of 0.7 in order to prevent handling of messages with low confidence.
 
-```
+```js
 function handleGeneralEnquiry(entity) {
 
   if (entity == null) return getDefaultResponse();
@@ -583,7 +584,7 @@ Also, notice how the greeting is handled differently? By utilising `Wit.ai`'s bu
 
 The template that we will use is the carousel of generic template, which consists of a list of elements. To do so, we create a new function `generateCarouselofProductsResponse` that takes in a list of products and converts to a response with a `template` attachment.
 
-```
+```js
 function generateCarouselOfProductsResponse(products) {
   
   return {
@@ -593,9 +594,9 @@ function generateCarouselOfProductsResponse(products) {
         "template_type": "generic",
         "elements":
         products.map(p => {
-          let subtitle = p['price'].toFixed(2);
+          let subtitle = '$' + p['price'].toFixed(2);
           if (p['pattern']) {
-            subtitle = '(' + p['pattern'] + ') $' + subtitle;
+            subtitle = '(' + p['pattern'] + ') ' + subtitle;
           }
 
           return {
@@ -605,12 +606,12 @@ function generateCarouselOfProductsResponse(products) {
             buttons: [
               {
                 type: "postback",
-                title: "Learn More",
+                title: "Learn more",
                 payload: `enquiry_product ${p['title']}`
               }, 
               {
                 type: "postback",
-                title: `Add to Cart`,
+                title: `Add to cart`,
                 payload: `cart_add ${p['pid']}`
               }
             ]
@@ -623,11 +624,13 @@ function generateCarouselOfProductsResponse(products) {
 }
 ```
 
+Notice that other than textual information, we have included **Learn More** and **Add to Cart** buttons. **Postbacks** are unlike normal messages, as they carry a `payload` property. More on postback will be discussed later.
+
 ### Updating `processMessage`
 
-Previously, we have trained the sentence "" with the `recommendation` intent. Now, we add the intent into the switch case.
+Previously, we have trained the sentence "Can you send me the list of products here to choose?" with the `recommendation` intent. Now, we add the intent into the switch case.
 
-```
+```js
 // Processes and sends text message
 function processMessage(message, nlp) {
   ...
@@ -664,6 +667,211 @@ To process the recommendation intent, we queried the database for all products a
 
 ## Adding to Cart
 
+### Deciphering Postbacks and Accessing Payload
+
+Postbacks are buttons with a `payload`, and a **postback event** is triggered when users interact with postback buttons. In order to retrieve the content of a postback, we will access the `postback` attribute of the `webhook_event` object.
+
+In the postback object, there are two attributes: `title` and `payload`, which are both defined in the **postback button** object. 
+
+To process the postback, the `webhook_event` handling needs to be modified in the POST request to the callback URL.
+
+```js
+let response = getDefaultResponse();
+if (webhook_event['message']) {
+  let message = webhook_event['message']['text'];
+  console.log('Message received from sender ' + sender_psid + ' : ' + message);
+  
+  let nlp = webhook_event['message']['nlp'];
+  response = processMessage(message, nlp);
+} else if (webhook_event['postback']) {
+  let payload = webhook_event['postback']['payload'];
+  response = processPayload(payload);
+}
+```
+
+### Processing the Postback Payload
+
+Let us now define how the postback will be processed. We have formatted the add to cart postback string in this format: `cart_add <quantity> <product_id> <product_name>`
+
+```js
+function processPayload(payload) {
+  let payload_parts = payload.split(' ');
+  // console.log(payload_parts);
+  let intent = payload_parts.shift();
+  
+  switch(intent) {
+    case 'cart_add':
+      // Example of payload: cart_add 1 123 Earl Grey Sunflower Seeds Cookies
+      let quantity = payload_parts.shift();
+      let pid = payload_parts.shift();
+      let product_name = payload_parts.join(' ');
+      
+      // Update cart in database
+
+      return getResponseFromMessage('Added ' + quantity + ' ' + product_name + ' to cart.');
+
+    default:
+      return getDefaultResponse();
+  }
+
+}
+```
+
+### Following Up with Quick Replies
+
+One way to increase engagement is to utilise **quick replies**. Quick replies are buttons anchored right on top of the the textbox (composer) for users to type their message.
+
+Let's try implementing it. First, replace
+
+```js
+return getResponseFromMessage('Added ' + quantity + ' ' + product_name + ' to cart.');
+```
+
+with
+
+```js
+return generateAddCartQuickRepliesResponse('Added ' + quantity + ' ' + product_name + ' to cart.');
+```
+
+The new `generateAddCartQuickRepliesResponse` function will create three buttons: **Checkout**, **View more products** and **View cart**. Quick replies, like postbacks, have a `payload` property. However, they are sent as `message` events instead of a `postback` events.
+
+```js
+function generateAddCartQuickRepliesResponse(message) {
+  return {
+    "text": message,
+    "quick_replies": [
+      {
+        "content_type": "text",
+        "title": "Checkout",
+        "payload": "checkout"
+      },
+      {
+        "content_type": "text",
+        "title": "View more products",
+        "payload": "recommendation"
+      }, {
+        "content_type": "text",
+        "title": 'View cart',
+        "payload": "cart_view"
+      }
+    ]
+  }
+
+}
+```
+
+Next, let us handle the quick reply payload in the POST endpoint of the callback URL.
+
+```js
+if (webhook_event['message']) {
+  let message = webhook_event['message']['text'];
+  console.log('Message received from sender ' + sender_psid + ' : ' + message);
+  
+  if (webhook_event['message']['quick_reply']) {
+    payload = webhook_event['message']['quick_reply']['payload'];
+    response = processPayload(payload);
+  } else {
+    let nlp = webhook_event['message']['nlp'];
+    response = processMessage(message, nlp);
+  }
+} else if (webhook_event['postback']) {
+  ...
+```
+
+Lastly, implement `recommendations` and `cart_view` intents in the `processPayload` function.
+
+```js
+case 'recommendation':
+  // Get products from database
+  let products = [
+    {
+      pid: 123,
+      title: 'Earl Grey Sunflower Seeds Cookies',
+      pattern: 'Box of 6',
+      price: 15.5
+    },
+    {
+      pid: 123,
+      title: 'Earl Grey Sunflower Seeds Cookies',
+      pattern: 'Box of 9',
+      price: 18.5
+    }
+  ]
+  
+  return generateCarouselOfProductsResponse(products);
+case 'cart_view':
+  // Get cart from database
+  let cart = [
+    {
+      pid: 123,
+      title: 'Earl Grey Sunflower Seeds Cookies',
+      pattern: 'Box of 6',
+      price: 15.5,
+      quantity: 1
+    },
+    {
+      pid: 123,
+      title: 'Earl Grey Sunflower Seeds Cookies',
+      pattern: 'Box of 9',
+      price: 18.5,
+      quantity: 2
+    }
+  ]
+
+  return generateCartResponse(cart);
+```
+
+```js
+function generateCartResponse(cart) {
+
+  return {
+    "attachment": {
+      "type": "template",
+      "payload": {
+        "template_type": "generic",
+        "elements":
+        cart.map(p => {
+          let subtitle = 'Qty: ' + p['quantity'] + ' ($' + p['price'].toFixed(2) + ' each)';
+          if (p['pattern']) {
+            subtitle = p['pattern'] + ', ' + subtitle;
+          }
+
+          return {
+            title: p['title'],
+            subtitle: subtitle,
+            // image_url: p['image_link'],
+            buttons: [
+              {
+                type: "postback",
+                title: "Add 1 to Cart",
+                payload: `cart_add 1 ${p['pid']} ${p['title']}`
+              }, 
+              {
+                type: "postback",
+                title: `Remove All`,
+                payload: `cart_remove_all ${p['pid']} ${p['title']}`
+              }
+            ]
+          }
+        })
+      }
+    }
+  }
+
+}
+```
+
+> For practice, try modifying how the `recommendation` intent is handled in `processPayload` by removing products that are in the user's cart!
+
+## Checkout
+
+## Challenge: Implement Product Enquiries
+
 ## Acknowledgements
 
-Special shoutout to Douglas Sim and Jelissa Ong, who helped build the Bright Social Enterprise Commerce Bot in the previous Messenger hackathon, and agreeing to allow us to use the Bright chatbot solution for this hackathon!
+Special shoutout to Douglas Sim and Jelissa Ong, who helped build the Bright Social Enterprise Commerce Bot in the previous Messenger hackathon, and agreeing to allow us to use Bright chatbot as a solution for this hackathon!
+
+## References
+
+- Postback Button: https://developers.facebook.com/docs/messenger-platform/reference/buttons/postback
+- Quick Replies: https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies/
