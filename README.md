@@ -336,7 +336,7 @@ Now, whenever your message includes any of those keywords in the `responses` obj
 
 ## Introduction to `Wit.ai` Natural Language Processing (NLP)
 
-Wit.ai is a NLP service that provides a user-friendly interface that facilitates easy training of your Facebook Messenger chatbot. Using Wit.ai’s own NLP engine, Wit.ai is essentially used to build the “brain” of Bright chatbot.
+Wit.ai is a NLP service that provides a user-friendly interface to facilitate training your Facebook Messenger chatbot. Using its own NLP engine, Wit.ai is essentially used to build the “brain” of Bright chatbot.
 
 ### Creating a Customised `Wit.ai` Application
 
@@ -344,7 +344,7 @@ Sign in to Wit.ai using Facebook and click on **New App**.
 
 ![](images/4_1.jpg)
 
-Let us name our application **BrightChatbot** and make its visibility **Private**. Click on **Create**. 
+Let's name our application **BrightChatbot** and make its visibility **Private**. Click on **Create**. 
 
 ![](images/4_2.jpg)
 
@@ -352,7 +352,7 @@ Congratulations, you’ve now made your first `Wit.ai` application.
 
 ![](images/4_3.jpg)
 
-You will see three side tabs titled Understanding, Management and Insights. Let’s start by training out chatbot on the Understanding tab.
+On the left side, you will see three tabs titled **Understanding**, **Management** and **Insights**. Let’s start by training out chatbot on the **Understanding** tab.
 
 ### Example of a Built-in Trait
 
@@ -381,7 +381,7 @@ During the training process, there is no need to wait for the previous utterance
 
 ### Training the Model to Understand the Entity in a Message
 
-What if instead of a general recommendation, the buyer wants to specifically buy a type of product such as cookies? We **classify cookies as `baker`** type products and would need the chatbot to recognise "cookies" as the **product_type** entity.
+What if instead of a general recommendation, the buyer wants to specifically buy a type of product such as cookies? We classify **cookies** as `baker` type products and would need the chatbot to recognise **cookies** as the **product_type** entity.
 
 Set utterance as “What types of cookies do you have?”
 The intent is `recommendation` by default as that’s the only intent we have trained so far.
@@ -392,7 +392,7 @@ To identify the intent, highlight "cookies":
 
 Create the entity **product_type**. The entity is now shown prior to training. For more complicated sentences with multiple entities, you can highlight and label them one by one.
 
-Change the **Resolved value** to `baker` as we want the cookies to be identified as in the baker category.
+Change the **Resolved value** to `baker` as we want the cookies to be identified as being in the baker category.
 
 ![](images/4_8.jpg)
 
@@ -404,10 +404,10 @@ Let’s train the chatbot to understand more utterances and intents to help it b
 
 | Sentence | Intent |
 | --- | --- |
-| How do I know if they are safe to consume? | `enquiry_general` |
+| **How do I know if they are safe to consume?** | `enquiry_general` |
 | I need help | `enquiry_general` |
-| When is delivery coming? | `enquiry_delivery` |
-| When is my order arriving? | `enquiry_delivery` |
+| **When is delivery coming?** | `enquiry_delivery` |
+| **When is my order arriving?** | `enquiry_delivery` |
 | What kind of cookies do you have? | `recommendation` |
 | Can you send me the list of products here to choose? | `recommendation` |
 
@@ -443,14 +443,14 @@ Set their entities to `estimated_arrival` for the text "when".
 
 ### Evaluating Performance
 
-See if the chatbot can correctly identify the intents for these questions?
+Test your chatbot and see whether it can correctly identify the intents for these questions?
 
 | Utterance | Actual Intent |
 | --- | --- |
 | What would you suggest? | `recommendation` |
 | When will my order be here? | `enquiry_delivery` |
 
-It is completely ok if the model does not recognise all of the intents correctly. In machine learning, the model will only work well with lots and lots of training. Therefore, do remember to train the model with these new data!
+In this scenario, it should be a success! However, it is completely all right if the model does not recognise all of the intents correctly. In machine learning, the model will only work well with lots and lots of training. Therefore, do remember to train the model with these new data!
 
 ### Connecting the Custom `Wit.ai` Model to your Facebook for Developers App
 
