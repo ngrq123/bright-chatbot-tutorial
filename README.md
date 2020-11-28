@@ -29,7 +29,7 @@ We recommend versioning your code on a GitHub repository.
 ### Facebook Page
 Creating a Facebook Page is a key step in your journey to creating a Messenger experience. Here are a few simple steps to help you get started:
 
-1. Go to facebook.com/pages/create - it should lead you to a page shown below
+1. Go to https://www.facebook.com/pages/create - it should lead you to a page shown below
 
 ![](images/create_page.jpg)
 
@@ -145,7 +145,7 @@ app.get('/webhook', (req, res) => {
 });
 ```
 
-7. Finally, you can now test your webhook by issuing the curl command (replace the <VERIFY_TOKEN> with your own token that you had specified in the previous step:
+7. Finally, you can now test your webhook by issuing the curl command (replace the `<VERIFY_TOKEN>` with your own token that you had specified in the previous step:
 
 ```sh
 curl -X GET "localhost:1337/webhook?hub.verify_token=<VERIFY_TOKEN>&hub.challenge=CHALLENGE_ACCEPTED&hub.mode=subscribe"
@@ -229,7 +229,7 @@ PAGE_ACCESS_TOKEN=<page_access_token>
 VERIFY_TOKEN=<verify_token>
 ```
 
-Create a `.gitignore` and add `.env` inside (if you have not). Also, add the variables to [Heroku](https://devcenter.heroku.com/articles/config-vars).  In our script, we the `dotenv` package is used to configure and retrieve the page access token. 
+Create a `.gitignore` and add `.env` inside (if you have not). Also, [add the variables to Heroku](https://devcenter.heroku.com/articles/config-vars).  In our script, we the `dotenv` package is used to configure and retrieve the page access token. 
 
 The start of your `index.js` should look like this (remember to add the new dependencies in `package.json` too):
 
@@ -342,11 +342,11 @@ Now, whenever your message includes any of those keywords in the `responses` obj
 
 ## Introduction to `Wit.ai` Natural Language Processing (NLP)
 
-Wit.ai is a NLP service that provides a user-friendly interface to facilitate training your Facebook Messenger chatbot. Using its own NLP engine, Wit.ai is essentially used to build the “brain” of Bright chatbot.
+`Wit.ai` is a NLP service that provides a user-friendly interface to facilitate training your Facebook Messenger chatbot. Using its own NLP engine, `Wit.ai` is essentially used to build the “brain” of Bright chatbot.
 
 ### Creating a Customised `Wit.ai` Application
 
-Sign in to Wit.ai using Facebook and click on **New App**. 
+Sign in to `Wit.ai` using Facebook and click on **New App**. 
 
 ![](images/4_1.jpg)
 
@@ -410,10 +410,10 @@ Let’s train the chatbot to understand more utterances and intents to help it b
 
 | Sentence | Intent |
 | --- | --- |
-| **How do I know if they are safe to consume?** | `enquiry_general` |
+| How do I know if they are safe to consume? | `enquiry_general` |
 | I need help | `enquiry_general` |
-| **When is delivery coming?** | `enquiry_delivery` |
-| **When is my order arriving?** | `enquiry_delivery` |
+| When is delivery coming? | `enquiry_delivery` |
+| When is my order arriving? | `enquiry_delivery` |
 | What kind of cookies do you have? | `recommendation` |
 | Can you send me the list of products here to choose? | `recommendation` |
 
@@ -435,9 +435,7 @@ You can now add entities to it! Highlight the word "safe" and add an entity call
 
 ![](images/4_11.jpg)
 
-Now, train!
-
-That’s really all there is to training your chatbot and managing it on Wit.ai
+Now, train! That’s really all there is to training your chatbot and managing it on `Wit.ai`.
 
 Deletions of any intents, entities and utterances can be handled in the management tab and their respective sections.
 
@@ -1126,3 +1124,7 @@ Special shoutout to Douglas Sim and Jelissa Ong, who helped to build the Bright 
 - Setting Up Your Facebook App: https://developers.facebook.com/docs/messenger-platform/getting-started/app-setup
 - Setting Up Your Webhook: https://developers.facebook.com/docs/messenger-platform/getting-started/webhook-setup
 - `Wit.ai` Recipes: https://wit.ai/docs/recipes
+
+## Devpost Submission
+
+https://devpost.com/software/create-smarter-messenger-experiences-on-facebook-with-bright
