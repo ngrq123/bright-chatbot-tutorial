@@ -576,9 +576,9 @@ Also, notice how the greeting is handled differently? By utilising `Wit.ai`'s bu
 
 ![](images/pretrained_greetings.png)
 
-## Optional: Creating a Business Database
+## Option 1: Creating a Business Database
 
-> This section is optional: Mock data (found at the end of this section) can be inserted at the top of `index.js` for chatbot development.
+> This section is one of the two options to insert data for Bright to consume. Alternatively, you can find the mock data to be inserted at the top of `index.js` for chatbot development in the next section.
 
 It is imperative that if you want to build a e-commerce platform, you would need a database to maintain certain details like processing of payments and tracking of delivery status of your products. Here, we are going to give a brief overview on how to create and connect your webhook application to **MongoDB**, a NoSQL Database.
 
@@ -615,7 +615,7 @@ require('./models/Cart');
 require('./models/Order');
 ```
 
-The model files are all provided in the `models` folder. Their corresponding schemas can be found in these files. Here is an example on how to the schema is written:
+The model files are all provided in the `models` [folder on GitHub](https://github.com/ngrq123/bright-chatbot-tutorial/tree/main/models). Their corresponding schemas can be found in these files. Here is an example on how to the schema is written:
 
 ```js
 const orderSchema = new mongoose.Schema({
@@ -640,7 +640,11 @@ The **key** in the schema object is the name of the column, and **value** is the
 
 An advantage on using MongoDB is that you would not have to create the collections, as the database system will automatically create them when we the first set of data (called document) is inserted into the database.
 
-**Mock Commerce Data**
+Now, you will need to insert data into the database. Mock data to be inserted into the database can be found in the following section.
+
+## Option 2: Adding Mock Commerce Data in `index.js`
+
+Insert the following mock data in `index.js`:
 
 ```js
 // Sets server port and logs message on success
@@ -655,14 +659,14 @@ let products = [
     title: 'Chocolate Chip Cookies',
     pattern: 'Box of 6',
     price: 15.5,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/chocolate_chip_cookies.jpg'
   },
   {
     pid: 456,
     title: 'Earl Grey Sunflower Seeds Cookies',
     pattern: 'Box of 9',
     price: 18.5,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/earl_grey_sunflower_seeds_cookies.jpg'
   }
 ]
 
@@ -673,7 +677,7 @@ let cart = [
     pattern: 'Box of 6',
     price: 15.5,
     quantity: 1,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/chocolate_chip_cookies.jpg'
   },
   {
     pid: 456,
@@ -681,7 +685,7 @@ let cart = [
     pattern: 'Box of 9',
     price: 18.5,
     quantity: 2,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/earl_grey_sunflower_seeds_cookies.jpg'
   }
 ]
 
@@ -692,7 +696,7 @@ let order = [
     pattern: 'Box of 6',
     price: 15.5,
     quantity: 1,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/chocolate_chip_cookies.jpg'
   },
   {
     pid: 456,
@@ -700,7 +704,7 @@ let order = [
     pattern: 'Box of 9',
     price: 18.5,
     quantity: 2,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/earl_grey_sunflower_seeds_cookies.jpg'
   }
 ]
 /*
@@ -776,7 +780,7 @@ function processMessage(message, nlp) {
     ...
 
     case 'recommendation':
-      // Get products from database
+      // For Option 1 only: Get products from database and assign it to a variable named "products"
       
       return generateCarouselOfProductsResponse(products);
 
@@ -841,7 +845,7 @@ function processPayload(payload) {
       let pid = payload_parts.shift();
       let product_name = payload_parts.join(' ');
       
-      // Update cart in database
+      // For Option 1 only: Update cart in database
 
       return getResponseFromMessage('Added ' + quantity + ' ' + product_name + ' to cart.');
 
@@ -919,11 +923,11 @@ Lastly, implement `recommendations` and `cart_view` intents in the `processPaylo
 
 ```js
 case 'recommendation':
-  // Get products from database
+  // For Option 1 only: Get products from database and assign it to a variable named "products"
   
   return generateCarouselOfProductsResponse(products);
 case 'cart_view':
-  // Get cart from database
+  // For Option 1 only: Get cart from database and assign it to a variable named "cart"
 
   return generateCartResponse(cart);
 ```
@@ -980,9 +984,9 @@ Continuing the ordering process, the user eventually checks out his cart. The `p
 
 ```js
 case 'checkout':
-  // Get order from database
+  // For Option 1 only: Get order from database and assign it to a variable named "order"
 
-  // Add to order and delete cart
+  // For Option 1 only: Add to order and delete cart from database
 
   return generateCheckoutResponse(order);
 ```
@@ -1021,7 +1025,7 @@ After the user clicks/taps on **Proceed to pay**, a receipt will be generated wi
 
 ```js
 case 'paid':
-  // Get latest order from database
+  // For Option 1 only: Get latest order from database and assign it to a variable named "order"
 
   return generateReceiptResponse(order);
 ```
@@ -1124,6 +1128,10 @@ Special shoutout to Douglas Sim and Jelissa Ong, who helped to build the Bright 
 - Setting Up Your Facebook App: https://developers.facebook.com/docs/messenger-platform/getting-started/app-setup
 - Setting Up Your Webhook: https://developers.facebook.com/docs/messenger-platform/getting-started/webhook-setup
 - `Wit.ai` Recipes: https://wit.ai/docs/recipes
+
+## Tutorial GitHub Link
+
+https://github.com/ngrq123/bright-chatbot-tutorial
 
 ## Devpost Submission
 
