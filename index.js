@@ -244,6 +244,8 @@ function processMessage(message, nlp) {
       console.log('Entity with highest confidence: ' + entity);
 
       return handleGeneralEnquiry(entity);
+    case 'enquiry_delivery':
+      return handleDeliveryEnquiry();
     case 'recommendation':
       // For Option 1 only: Get products from database and assign it to a variable named "products"
 
@@ -273,6 +275,10 @@ function handleGeneralEnquiry(entity) {
   };
   
   return getResponseFromMessage(responses[entity]);
+}
+
+function handleDeliveryEnquiry() {
+  return getResponseFromMessage('We deliver islandwide. The average delivery time takes 5-7 days.');
 }
 
 function generateCarouselOfProductsResponse(products) {

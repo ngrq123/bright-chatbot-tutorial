@@ -591,7 +591,96 @@ function handleGeneralEnquiry(entity) {
   
   return getResponseFromMessage(responses[entity]);
 }
+``` 
+
+### Handling the Delivery Enquiry Intent
+
+Let us now work with messages of the `enquiry_delivery` intent. To recap, the following utterances have been trained to be classified as delivery enquiries:
+
+| Utterance | Intent |
+| --- | --- |
+| When is delivery coming? | `enquiry_delivery` |
+| When is my order arriving? | `enquiry_delivery` |
+| When will my order be here? | `enquiry_delivery` |
+
+Again, we will modify the `processMessage` function: 
+
+```js
+// Processes and sends text message
+function processMessage(message, nlp) {
+  ...
+  switch (intent) {
+    ...
+
+    case 'enquiry_delivery':
+      return handleDeliveryEnquiry();
+
+    default:
+      return getDefaultResponse();
+  }
+
+}
 ```
+
+This time, we create the function `handleDeliveryEnquiry` to handle delivery enquiries:
+
+```js
+function handleDeliveryEnquiry() {
+  return getResponseFromMessage('We deliver islandwide. The average delivery time takes 5-7 days.');
+}
+```
+
+Let us try to see if the chatbot can handle the message "Can my order arrive in 2 days?". It works! 
+
+What about "Can I receive the package in 2 days?". Unfortunately, it is unable to correctly classify the intent based on the response. We will need to investigate why.
+
+![](images/misclassified_message_and_response.jpg)
+
+#### Working with `Wit.ai` and Messenger
+
+The message "Can I receive the package in 2 days?" is wrongly classified as a general enquiry with a confidence score of 0.572 (do note that it is completely normal if your confidence score is different).
+
+Since the message is classified as a general enquiry, did the chatbot handle the message as a general response and return the default response? No. The default response was returned from the `processMessage` function, as the confidence score is [below the threshold of 0.7 that we had set in the previous section](#handling-general-enquiries). 
+
+Even though the model classified the message as a general enquiry, the confidence score of only 0.572 shows that it is unsure of the classification.
+
+So how can we view the confidence score? Previously, we implemented the following logging statements in the `processMessage` function:
+
+```js
+console.log('Intents inferred from NLP model: ')
+console.table(nlp['intents']);
+```
+
+We can view the score in the webhook's logs [in Heroku](https://devcenter.heroku.com/articles/logging#log-retrieval-via-the-web-dashboard):
+```
+Intents inferred from NLP model: 
+┌─────────┬────────────────────┬───────────────────┬────────────┐
+│ (index) │         id         │       name        │ confidence │
+├─────────┼────────────────────┼───────────────────┼────────────┤
+│    0    │ '1694432440724955' │ 'enquiry_general' │   0.572    │
+└─────────┴────────────────────┴───────────────────┴────────────┘
+```
+
+Similarly, we see that the message is misclassified in the `Wit.ai` model's **Utterance** tab:
+
+![](images/misclassified_utterance.jpg)
+
+Let us rectify the misclassified message. Select the the **Intent dropdown**. From the dropdown box, we can verify the confidence (57%) in `Wit.ai`. Click on `enquiry_delivery`, then click **Train and Validate**.
+
+![](images/rectify_misclassified_utterance.jpg)
+
+In the chatbot, let us send the same message "Can I receive the package in 2 days?". A high confidence score can be seen in both the logs and on `Wit.ai`.
+
+```
+Intents inferred from NLP model: 
+┌─────────┬────────────────────┬───────────────────┬────────────┐
+│ (index) │         id         │       name        │ confidence │
+├─────────┼────────────────────┼───────────────────┼────────────┤
+│    0    │ '381501166565779'  │ 'enquiry_general' │   0.9959   │
+└─────────┴────────────────────┴───────────────────┴────────────┘
+```
+
+![](images/rectified_utterance.jpg)
 
 ## Option 1: Creating a Business Database
 
