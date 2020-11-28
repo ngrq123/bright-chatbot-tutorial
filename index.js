@@ -245,7 +245,7 @@ function processMessage(message, nlp) {
 
       return handleGeneralEnquiry(entity);
     case 'recommendation':
-      // Get products from database
+      // For Option 1 only: Get products from database and assign it to a variable named "products"
 
       return generateCarouselOfProductsResponse(products);
 
@@ -325,25 +325,25 @@ function processPayload(payload) {
       let pid = payload_parts.shift();
       let product_name = payload_parts.join(' ');
       
-      // Update cart in database
+      // For Option 1 only: Update cart in database
 
       return generateAddCartQuickRepliesResponse('Added ' + quantity + ' ' + product_name + ' to cart.');
     case 'recommendation':
-      // Get products from database
+      // For Option 1 only: Get products from database and assign it to a variable named "products"
 
       return generateCarouselOfProductsResponse(products);
     case 'cart_view':
-      // Get cart from database
+      // For Option 1 only: Get cart from database and assign it to a variable named "cart"
 
       return generateCartResponse(cart);
     case 'checkout':
-      // Get cart from database
+      // For Option 1 only: Get order from database and assign it to a variable named "order"
 
-      // Add to order and delete cart
+      // For Option 1 only: Add to order and delete cart from database
 
       return generateCheckoutResponse(order);
     case 'paid':
-      // Get latest order from database
+      // For Option 1 only: Get latest order from database and assign it to a variable named "order"
 
       return generateReceiptResponse(order);
     default:
