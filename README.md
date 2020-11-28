@@ -508,7 +508,7 @@ function processMessage(message, nlp) {
 }
 ```
 
-By utilising `Wit.ai`'s built-in `greetings` trait, we are able to leverage on the detection based on pretrained data, which means that we do not have to train greetings like "Hi" ourselves!
+By utilising `Wit.ai`'s built-in greetings trait `wit/greetings`, we are able to leverage on the detection based on pretrained data, which means that we do not have to train greetings like "Hi" ourselves!
 
 ![](images/pretrained_greetings.png)
 
@@ -543,14 +543,14 @@ function processMessage(message, nlp) {
 
   // If confidence of intent is less than threshold, do not process
   if (confidence < 0.7) return getDefaultResponse();
+  
+  let entities = nlp['entities'];
+  let highest_confidence = 0;
 
   switch (intent) {
     case 'enquiry_general':
-      let entities = nlp['entities'];
-
       // Get entity with highest confidence
       let entity = null;
-      let highest_confidence = 0;
       for (const e in entities) {
         let confidence = entities[e][0]['confidence'];
         if (confidence > highest_confidence) {
@@ -640,7 +640,7 @@ What about "Can I receive the package in 2 days?". Unfortunately, it is unable t
 
 The message "Can I receive the package in 2 days?" is wrongly classified as a general enquiry with a confidence score of 0.572 (do note that it is completely normal if your confidence score is different).
 
-Since the message is classified as a general enquiry, did the chatbot handle the message as a general response and return the default response? No. The default response was returned from the `processMessage` function, as the confidence score is [below the threshold of 0.7 that we had set in the previous section](#handling-general-enquiries). 
+Since the message is classified as a general enquiry, did the chatbot handle the message as a general response and return the default response? No. The default response was returned from the `processMessage` function, as the confidence score is [below the threshold of 0.7 that we had set in the previous section](#handling-the-general-enquiry-intent). 
 
 Even though the model classified the message as a general enquiry, the confidence score of only 0.572 shows that it is unsure of the classification.
 
@@ -665,7 +665,7 @@ Similarly, we see that the message is misclassified in the `Wit.ai` model's **Ut
 
 ![](images/misclassified_utterance.jpg)
 
-Let us rectify the misclassified message. Select the the **Intent dropdown**. From the dropdown box, we can verify the confidence (57%) in `Wit.ai`. Click on `enquiry_delivery`, then click **Train and Validate**.
+Let us rectify the misclassified message. Select the **Intent dropdown**. From the dropdown, we can verify the confidence (57%) in `Wit.ai`. Click on `enquiry_delivery`, then click **Train and Validate**.
 
 ![](images/rectify_misclassified_utterance.jpg)
 
@@ -681,6 +681,119 @@ Intents inferred from NLP model:
 ```
 
 ![](images/rectified_utterance.jpg)
+
+The message will be correctly handled.
+
+![](images/rectified_message_handling.jpg)
+
+You have now learnt how the NLP model on `Wit.ai` is linked to the chatbot and how to build with them!
+
+#### Personalising Responses with the Value of `wit/datetime` Built-In Entity
+
+Notice that `Wit.ai` has a suggested a date and time entity `wit/datetime` in the "Can I receive the package in 2 days?" utterance? Similar to the greetings trait `wit/greetings`, the date and time entity is built-in. The list of built-in entities and traits can be found at https://wit.ai/docs/built-in-entities/
+
+When we modify the `enquiry_delivery` case in the switch statement of `processMessage` to log the message's entities, an empty object `{}` is printed.
+
+```js
+// Processes and sends text message
+function processMessage(message, nlp) {
+  ...
+  switch (intent) {
+    ...
+
+    case 'enquiry_delivery':
+      console.log(nlp['entities']);
+      return handleDeliveryEnquiry();
+
+    default:
+      return getDefaultResponse();
+  }
+
+}
+```
+
+In the **Utterance** tab, under the "Can I receive the package in 2 days?" utterance, click **Add** to add the entity. When `nlp['entities']` is logged, the date and time entity will be shown:
+
+```js
+{ 'wit$datetime:datetime':
+   [ { id: '222986959252376',
+       name: 'wit$datetime',
+       role: 'datetime',
+       start: 26,
+       end: 35,
+       body: 'in 2 days',
+       confidence: 0.9672,
+       entities: [],
+       type: 'value',
+       grain: 'hour',
+       value: '2020-11-30T22:00:00.000+08:00',
+       values: [Array] } 
+  ] 
+}
+```
+
+As of the date and time of writing (2020-11-28, 10pm Singapore time), the date and time two days later is 2020-11-30, 10pm. To calculate the date and time, we will need to retrieve the future date in the `values` attribute.
+
+We modify the `processMessage` function to pass the `entities` object as an argument in the `handleDeliveryEnquiry` function:
+
+```js
+// Processes and sends text message
+function processMessage(message, nlp) {
+  ...
+  switch (intent) {
+    ...
+
+    case 'enquiry_delivery':
+      // Get value with highest confidence
+      let value = null;
+      if ('wit$datetime:datetime' in entities) {
+        for (const e of entities['wit$datetime:datetime']) {
+          console.log(e);
+          let confidence = e['confidence'];
+          if (confidence > highest_confidence) {
+            highest_confidence = confidence;
+            // Type is either "value" or "interval"
+            value = (e['type'] === 'value') ? e['value'] : e['to']['value'];
+          }
+        }
+        console.log('Value with highest confidence: ' + value);
+      }
+      
+      return handleDeliveryEnquiry(value);
+
+    default:
+      return getDefaultResponse();
+  }
+
+}
+```
+
+Next, we modify the `handleDeliveryEnquiry` function:
+
+```js
+function handleDeliveryEnquiry(value) {
+  if (value == null) return getResponseFromMessage('We deliver islandwide. The average delivery time takes 5-7 days.');
+
+  // Get days between now and date time value and round up
+  let days = ((new Date(value)) - Date.now()) / (1000 * 60 * 60 * 24);
+  days = Math.ceil(days);
+
+  let message = 'The average delivery time takes 5-7 days.';
+  if (days < 5) {
+    message = 'It is unlikely to arrive in ' + days + ' days. ' + message;
+  } else if (days < 7) {
+    message = 'It may arrive in ' + days + ' days. ' + message;
+  } else {
+    message = 'It is likely to arrive in ' + days + ' days. ' + message;
+  }
+
+  return getResponseFromMessage(message);
+}
+```
+
+Give it a try! Notice how in the following example, the built-in date and time entity in `Wit.ai` is able to interpet the term "two weeks" without us training the model.
+
+![](images/handling_entity_values.jpg)
 
 ## Option 1: Creating a Business Database
 
