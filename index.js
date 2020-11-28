@@ -26,7 +26,7 @@ let products = [
     image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/chocolate_chip_cookies.jpg'
   },
   {
-    pid: 123,
+    pid: 456,
     title: 'Earl Grey Sunflower Seeds Cookies',
     pattern: 'Box of 9',
     price: 18.5,
@@ -41,7 +41,7 @@ let cart = [
     pattern: 'Box of 6',
     price: 15.5,
     quantity: 1,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/chocolate_chip_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/chocolate_chip_cookies.jpg'
   },
   {
     pid: 456,
@@ -49,11 +49,28 @@ let cart = [
     pattern: 'Box of 9',
     price: 18.5,
     quantity: 2,
-    image_link: 'https://github.com/ngrq123/bright-chatbot-tutorial/blob/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/earl_grey_sunflower_seeds_cookies.jpg'
   }
 ]
 
-let order = cart;
+let order = [
+  {
+    pid: 123,
+    title: 'Chocolate Chip Cookies',
+    pattern: 'Box of 6',
+    price: 15.5,
+    quantity: 1,
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/chocolate_chip_cookies.jpg'
+  },
+  {
+    pid: 456,
+    title: 'Earl Grey Sunflower Seeds Cookies',
+    pattern: 'Box of 9',
+    price: 18.5,
+    quantity: 2,
+    image_link: 'https://raw.githubusercontent.com/ngrq123/bright-chatbot-tutorial/main/images/earl_grey_sunflower_seeds_cookies.jpg'
+  }
+]
 /*
   End of mock data in database (remove if database is implemented)
 */
