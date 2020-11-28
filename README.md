@@ -373,7 +373,7 @@ Our `Wit.ai` application is pre-trained to identify a number common greetings. W
 
 Let’s train the chatbot to understand a generic question seeking a product recommendation.
 
-In the Utterance tab, type the utterance “I want to buy something”. Click the **Choose or add intent** drop-down list and create new intent **recommendation**.
+In the **Utterance** tab, type the utterance “I want to buy something”. Click the **Choose or add intent** drop-down list and create new intent **recommendation**.
 
 ![](images/4_5.jpg)
 
@@ -408,7 +408,7 @@ Now **Train and Validate**. The chatbot’s learning is not limited to only the 
 
 Let’s train the chatbot to understand more utterances and intents to help it better understand future queries. Train it with the following:
 
-| Sentence | Intent |
+| Utterance | Intent |
 | --- | --- |
 | How do I know if they are safe to consume? | `enquiry_general` |
 | I need help | `enquiry_general` |
@@ -466,7 +466,7 @@ Now we are ready to use your `Wit.ai` model (NLP model) outputs to process messa
 
 We will now train the messages that we have handled with the standard responses in the NLP model. All of the messages are of the same intent `enquiry_general`, but the entities of the general enquiry are different, which allows us to differentiate between the queries the user has.
 
-| Sentence | Intent | Phrase -> Entity |
+| Utterance | Intent | Phrase -> Entity |
 | --- | --- | --- |
 | Who is Bright? | `enquiry_general` | Bright -> `organisation` |
 | Where does your proceeds go to? | `enquiry_general` | proceeds -> `profit` |
@@ -474,7 +474,9 @@ We will now train the messages that we have handled with the standard responses 
 | What do you sell? | `enquiry_general` | sell -> `products` |
 | How do I know if they are safe to consume? | `enquiry_general` | safe -> `safety` |
 
-Let us modify our post request function to retrieve the NLP model output and pass it in as a new, second argument in `processMessage`.
+### Handling the Greeting Trait
+
+Let us modify our POST request function to retrieve the NLP model output and pass it in as a new, second argument in `processMessage`.
 
 ```js
 console.log('Message received from sender ' + sender_psid + ' : ' + message);
@@ -485,15 +487,15 @@ let response = processMessage(message, nlp);
 callSendAPI(sender_psid, response);
 ```
 
-Let us first wrap the default message in a new `getDefaultResponse` function, which will be used in early returns.
+Then, wrap the default message in a new `getDefaultResponse` function, which will be used in early returns and when there are neither intents nor traits found in the message.
 
-```
+```js
 function getDefaultResponse() {
   return getResponseFromMessage("We could not understand your message. Kindly rephrase your message and send us again.");
 }
 ```
 
-We will then modify the processMessage function, and abstracting the general enquiry handling into another function `handleGeneralEnquiry`.
+Next, we modify the `processMessage` function.
 
 ```js
 // Processes and sends text message
@@ -511,6 +513,25 @@ function processMessage(message, nlp) {
     
     console.log('Returning default response');
     return getDefaultResponse();
+  }
+
+}
+```
+
+By utilising `Wit.ai`'s built-in `greetings` trait, we are able to leverage on the detection based on pretrained data, which means that we do not have to train greetings like "Hi" ourselves!
+
+![](images/pretrained_greetings.png)
+
+### Handling the General Enquiry Intent
+
+To handle general enquiries, we first modify the `processMessage` function to retrieve the `enquiry_general` intent and its entities, then abstract the handling of general enquiries into another function `handleGeneralEnquiry`.
+
+```js
+// Processes and sends text message
+function processMessage(message, nlp) {
+  
+  if (nlp['intents'].length === 0) {
+    ...
   }
 
   console.log('Intents inferred from NLP model: ')
@@ -548,7 +569,7 @@ function processMessage(message, nlp) {
 }
 ```
 
-We set a arbitrary confidence threshold of 0.7 in order to prevent handling of messages with low confidence.
+We had set a arbitrary confidence threshold of 0.7 in order to prevent handling of messages with low confidence scores.
 
 ```js
 function handleGeneralEnquiry(entity) {
@@ -571,10 +592,6 @@ function handleGeneralEnquiry(entity) {
   return getResponseFromMessage(responses[entity]);
 }
 ```
-
-Also, notice how the greeting is handled differently? By utilising `Wit.ai`'s built-in `greetings` trait, we are able to leverage on the detection based on pretrained data, which means that we do not have to train greetings like "Hi" ourselves!
-
-![](images/pretrained_greetings.png)
 
 ## Option 1: Creating a Business Database
 
