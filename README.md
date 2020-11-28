@@ -1018,7 +1018,11 @@ To process the recommendation intent, we queried the database for all products a
 
 ### Deciphering Postbacks and Accessing Payload
 
-Postbacks are buttons with a `payload`, and a **postback event** is triggered when users interact with postback buttons. In order to retrieve the content of a postback, we will access the `postback` attribute of the `webhook_event` object.
+Postbacks are buttons with a `payload`, and a **postback event** is triggered when users interact with postback buttons. 
+
+> Postbacks are not utterances - they will not be able to be trained on, and will not be passed through the `Wit.ai` NLP model.
+
+In order to retrieve the content of a postback, we will access the `postback` attribute of the `webhook_event` object.
 
 In the `postback` object, there are two attributes: `title` and `payload`, which are both defined in the **postback button** object. 
 
@@ -1076,6 +1080,10 @@ function processPayload(payload) {
 ```
 
 ![](images/cart_add.png)
+
+> If you are unable to receive the postback, check your Facebook for Developers App to see if `messaging_postbacks` field is shown under **Webhooks** in the Messenger settings.
+> ![](images/check_webhook_fields.jpg)
+> If it is not shown, click **Edit** and check **messaging_postbacks**
 
 ### Following Up with Quick Replies
 
