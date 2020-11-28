@@ -226,13 +226,13 @@ function processMessage(message, nlp) {
   // If confidence of intent is less than threshold, do not process
   if (confidence < 0.7) return getDefaultResponse();
 
+  let entities = nlp['entities'];
+  let highest_confidence = 0;
+
   switch (intent) {
     case 'enquiry_general':
-      let entities = nlp['entities'];
-
       // Get entity with highest confidence
       let entity = null;
-      let highest_confidence = 0;
       for (const e in entities) {
         let confidence = entities[e][0]['confidence'];
         if (confidence > highest_confidence) {
@@ -245,7 +245,22 @@ function processMessage(message, nlp) {
 
       return handleGeneralEnquiry(entity);
     case 'enquiry_delivery':
-      return handleDeliveryEnquiry();
+      // Get value with highest confidence
+      let value = null;
+      if ('wit$datetime:datetime' in entities) {
+        for (const e of entities['wit$datetime:datetime']) {
+          console.log(e);
+          let confidence = e['confidence'];
+          if (confidence > highest_confidence) {
+            highest_confidence = confidence;
+            // Type is either "value" or "interval"
+            value = (e['type'] === 'value') ? e['value'] : e['to']['value'];
+          }
+        }
+        console.log('Value with highest confidence: ' + value);
+      }
+      
+      return handleDeliveryEnquiry(value);
     case 'recommendation':
       // For Option 1 only: Get products from database and assign it to a variable named "products"
 
@@ -277,8 +292,23 @@ function handleGeneralEnquiry(entity) {
   return getResponseFromMessage(responses[entity]);
 }
 
-function handleDeliveryEnquiry() {
-  return getResponseFromMessage('We deliver islandwide. The average delivery time takes 5-7 days.');
+function handleDeliveryEnquiry(value) {
+  if (value == null) return getResponseFromMessage('We deliver islandwide. The average delivery time takes 5-7 days.');
+
+  // Get days between now and date time value and round up
+  let days = ((new Date(value)) - Date.now()) / (1000 * 60 * 60 * 24);
+  days = Math.ceil(days);
+
+  let message = 'The average delivery time takes 5-7 days.';
+  if (days < 5) {
+    message = 'It is unlikely to arrive in ' + days + ' days. ' + message;
+  } else if (days < 7) {
+    message = 'It may arrive in ' + days + ' days. ' + message;
+  } else {
+    message = 'It is likely to arrive in ' + days + ' days. ' + message;
+  }
+
+  return getResponseFromMessage(message);
 }
 
 function generateCarouselOfProductsResponse(products) {
