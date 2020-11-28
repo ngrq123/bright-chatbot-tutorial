@@ -464,16 +464,6 @@ You can now connect your `Wit.ai` model to your Facebook for Developers App! You
 
 Now we are ready to use your `Wit.ai` model (NLP model) outputs to process messages! Let us first understand how this works. When a user interacts with Bright, the message will first be sent to the NLP model. The outputs of the model will be sent in the message webhook and can be retrieved in the `nlp` key in the `message` object.
 
-We will now train the messages that we have handled with the standard responses in the NLP model. All of the messages are of the same intent `enquiry_general`, but the entities of the general enquiry are different, which allows us to differentiate between the queries the user has.
-
-| Utterance | Intent | Phrase -> Entity |
-| --- | --- | --- |
-| Who is Bright? | `enquiry_general` | Bright -> `organisation` |
-| Where does your proceeds go to? | `enquiry_general` | proceeds -> `profit` |
-| Who makes the products? | `enquiry_general` | Who makes -> `manufacturer` |
-| What do you sell? | `enquiry_general` | sell -> `products` |
-| How do I know if they are safe to consume? | `enquiry_general` | safe -> `safety` |
-
 ### Handling the Greeting Trait
 
 Let us modify our POST request function to retrieve the NLP model output and pass it in as a new, second argument in `processMessage`.
@@ -523,6 +513,16 @@ By utilising `Wit.ai`'s built-in `greetings` trait, we are able to leverage on t
 ![](images/pretrained_greetings.png)
 
 ### Handling the General Enquiry Intent
+
+We will now train the messages that we have handled with the [standard responses](#sending-standard-responses) in the NLP model. All of the messages are of the same intent `enquiry_general`, but the entities of the general enquiry are different, which allows us to differentiate between the queries the user has.
+
+| Utterance | Intent | Phrase -> Entity |
+| --- | --- | --- |
+| Who is Bright? | `enquiry_general` | Bright -> `organisation` |
+| Where does your proceeds go to? | `enquiry_general` | proceeds -> `profit` |
+| Who makes the products? | `enquiry_general` | Who makes -> `manufacturer` |
+| What do you sell? | `enquiry_general` | sell -> `products` |
+| How do I know if they are safe to consume? | `enquiry_general` | safe -> `safety` |
 
 To handle general enquiries, we first modify the `processMessage` function to retrieve the `enquiry_general` intent and its entities, then abstract the handling of general enquiries into another function `handleGeneralEnquiry`.
 
