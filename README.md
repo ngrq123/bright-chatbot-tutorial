@@ -1386,13 +1386,16 @@ When clicked, the receipt expands:
 
 ![](images/receipt.png)
 
-## Personalising Replies with User First Name
-One way we can further personalise the chatbot's responses by incorporating the user's first name.
+## Personalising Replies with User's First Name
 
-To do this, we will use Facebook Graph API to retrieve publicly available information off the user's Facebook account. Let's retrieve the user's first name with a new `getName` function:
+One way we can further personalise the chatbot's responses is by incorporating the user's first name.
+
+To do this, we will use the Facebook Graph API to retrieve this publicly available information of the user's Facebook account. 
+
+Let's retrieve the user's first name with a `getName` function:
 
 ```js
-async function getName(PAGE_ACCESS_TOKEN, sender_psid){
+async function getName(PAGE_ACCESS_TOKEN, sender_psid) {
   let uri = "https://graph.facebook.com/v8.0/"
   let response = await fetch(uri + sender_psid + "?fields=first_name&access_token=" + PAGE_ACCESS_TOKEN);
   if (response.ok) {
@@ -1409,7 +1412,64 @@ The `getName` function takes in two parameters: `PAGE_ACCESS_TOKEN` and `sender_
 
 > The `getName` function sends a request to Facebook and the result has to be processed before generating a response. To do so, you need to utilise async/await. You can only perform an await in an asynchronous function and whenever you call an asynchronous function, any function that calls it has to be asynchronous as well.
 
-We will incorporate the user's first name in the welcome response and in the receipt.
+Let us modify the following in our code:
+- POST request endpoint
+- `processMessage` function
+- `processPayload` function
+- `generateReceiptResponse` function
+
+First, update the POST request endpoint:
+
+```js
+// Creates the endpoint for our webhook 
+app.post('/webhook', (req, res) => {  
+  
+  let body = req.body;
+  
+  // Checks this is an event from a page subscription
+  if (body.object === 'page') {
+    
+    // Iterates over each entry - there may be multiple if batched
+    body.entry.forEach(async function(entry) {
+      
+      // Gets the message. entry.messaging is an array, but 
+      // will only ever contain one message, so we get index 0
+      let webhook_event = entry.messaging[0];
+      console.log(webhook_event);
+
+      let sender_psid = webhook_event['sender']['id'];
+
+      let response = getDefaultResponse();
+      if (webhook_event['message']) {
+        let message = webhook_event['message']['text'];
+        console.log('Message received from sender ' + sender_psid + ' : ' + message);
+        
+        if (webhook_event['message']['quick_reply']) {
+          let payload = webhook_event['message']['quick_reply']['payload'];
+          response = await processPayload(sender_psid, payload);
+        } else {
+          let nlp = webhook_event['message']['nlp'];
+          response = await processMessage(sender_psid, message, nlp);
+        }
+      } else if (webhook_event['postback']) {
+        let payload = webhook_event['postback']['payload'];
+        response = await processPayload(sender_psid, payload);
+      }
+      
+      callSendAPI(sender_psid, response);
+    });
+    
+    // Returns a '200 OK' response to all requests
+    res.status(200).send('EVENT_RECEIVED');
+  } else {
+    // Returns a '404 Not Found' if event is not from a page subscription
+    res.sendStatus(404);
+  }
+  
+});
+```
+
+Second, we will incorporate the user's first name in the welcome response in `processMessage`.
 
 ```js
 // Processes and sends text message
@@ -1422,7 +1482,7 @@ async function processMessage(sender_psid, message, nlp) {
 
     if (traits['wit$greetings'] && traits['wit$greetings'][0]['value'] === 'true') {
       console.log('Is greeting');
-      //Add the getName function call here
+      // Add the getName function call here
       let name = await getName(PAGE_ACCESS_TOKEN,sender_psid);
       return getResponseFromMessage('Hi ' + name + '! Welcome to Bright. How can I help you?');
     }
@@ -1430,11 +1490,32 @@ async function processMessage(sender_psid, message, nlp) {
     console.log('Returning default response');
     return getDefaultResponse();
   }
+  ...
+}
 ```
 
 ![](images/hello_message.jpg)
 
-To customise the receipt with your user's first name, we modify the `generateReceiptResponse` function as follows:
+Lastly, to customise the receipt with your user's first name, we modify the `processPayload`  and `generateReceiptResponse` functions.
+
+```js
+async function processPayload(sender_psid, payload) {
+  let payload_parts = payload.split(' ');
+  // console.log(payload_parts);
+  let intent = payload_parts.shift();
+  
+  switch(intent) {
+    ...
+    case 'paid':
+      // For Option 1 only: Get latest order from database and assign it to a variable named "order"
+
+      return await generateReceiptResponse(sender_psid, order);
+    default:
+      return getDefaultResponse();
+  }
+
+}
+```
 
 ```js
 // Processes and sends text message
@@ -1449,41 +1530,16 @@ async function generateReceiptResponse(sender_psid, order) {
       payload: {
         template_type: "receipt",
         recipient_name: name,
-        order_number: "bf23ad46d123",
-        currency: "SGD",
-        payment_method: "PayPal",
-        order_url: "",
-        address: {
-          street_1: "9 Straits View",
-          city: "Singapore",
-          postal_code: "018937",
-          state: "SG",
-          country: "SG"
-        },
-        summary: {
-          subtotal: total_price.toFixed(2),
-          shipping_cost: 5,
-          total_tax: ((total_price+5)*0.07).toFixed(2),
-          total_cost: (total_price+5).toFixed(2)
-        },
-        elements: order.map(product => {
-          return {
-            title: `${product["name"]}`,
-            title: product["title"],
-            subtitle: product["pattern"],
-            quantity: product["quantity"],
-            price: product["price"]*product["quantity"],
-            currency: "SGD",
-            image_url: product["image_link"]
-          };
-        })
+        ...
       }
     }
   };
 }
 ```
 
-![](images/order_confirmation.jpg) 
+![](images/order_confirmation.jpg)
+
+Good job in making it thus far, we are proud of you! Now let's see if you can apply what you have learnt in the following challenges.
 
 ## Challenge 1: Order Enquiry
 
