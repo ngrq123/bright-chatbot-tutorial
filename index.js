@@ -7,6 +7,7 @@ const
   app = express().use(bodyParser.json()), // creates express http server
   dotenv = require('dotenv'),
   request = require('request');
+  global.fetch = require("node-fetch");
 
 dotenv.config();
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
@@ -116,7 +117,7 @@ app.post('/webhook', (req, res) => {
   if (body.object === 'page') {
     
     // Iterates over each entry - there may be multiple if batched
-    body.entry.forEach(function(entry) {
+    body.entry.forEach(async function(entry) {
       
       // Gets the message. entry.messaging is an array, but 
       // will only ever contain one message, so we get index 0
@@ -132,14 +133,14 @@ app.post('/webhook', (req, res) => {
         
         if (webhook_event['message']['quick_reply']) {
           let payload = webhook_event['message']['quick_reply']['payload'];
-          response = processPayload(payload);
+          response = await processPayload(sender_psid, payload);
         } else {
           let nlp = webhook_event['message']['nlp'];
-          response = processMessage(message, nlp);
+          response = await processMessage(sender_psid, message, nlp);
         }
       } else if (webhook_event['postback']) {
         let payload = webhook_event['postback']['payload'];
-        response = processPayload(payload);
+        response = await processPayload(sender_psid, payload);
       }
       
       callSendAPI(sender_psid, response);
@@ -200,7 +201,7 @@ function getDefaultResponse() {
 }
 
 // Processes and sends text message
-function processMessage(message, nlp) {
+async function processMessage(sender_psid, message, nlp) {
   
   if (nlp['intents'].length === 0) {
     
@@ -209,7 +210,8 @@ function processMessage(message, nlp) {
 
     if (traits['wit$greetings'] && traits['wit$greetings'][0]['value'] === 'true') {
       console.log('Is greeting');
-      return getResponseFromMessage('Hi there! Welcome to Bright. How can I help you?');
+      let name = await getName(PAGE_ACCESS_TOKEN,sender_psid);
+      return getResponseFromMessage('Hi ' + name + '! Welcome to Bright. How can I help you?');
     }
     
     console.log('Returning default response');
@@ -349,7 +351,7 @@ function generateCarouselOfProductsResponse(products) {
 
 }
 
-function processPayload(payload) {
+async function processPayload(sender_psid, payload) {
   let payload_parts = payload.split(' ');
   // console.log(payload_parts);
   let intent = payload_parts.shift();
@@ -381,7 +383,7 @@ function processPayload(payload) {
     case 'paid':
       // For Option 1 only: Get latest order from database and assign it to a variable named "order"
 
-      return generateReceiptResponse(order);
+      return await generateReceiptResponse(sender_psid, order);
     default:
       return getDefaultResponse();
   }
@@ -471,15 +473,16 @@ function generateCheckoutResponse(order) {
 
 }
 
-function generateReceiptResponse(order) {
+async function generateReceiptResponse(sender_psid, order) {
   let total_price = order.reduce((acc, p) => acc + p['price'] * p['quantity'], 0);
+  let name = await getName(PAGE_ACCESS_TOKEN,sender_psid);
 
   return {
     attachment: {
       type: "template",
       payload: {
         template_type: "receipt",
-        recipient_name: "John Doe",
+        recipient_name: name,
         order_number: "bf23ad46d123",
         currency: "SGD",
         payment_method: "PayPal",
@@ -511,4 +514,17 @@ function generateReceiptResponse(order) {
       }
     }
   };
+}
+
+async function getName(PAGE_ACCESS_TOKEN, sender_psid){
+  let uri = "https://graph.facebook.com/v8.0/"
+  let response = await fetch(uri + sender_psid + "?fields=first_name&access_token=" + PAGE_ACCESS_TOKEN);
+  if (response.ok) {
+      let body = await response.json();
+      console.log(body.first_name)
+      return body.first_name;
+  }
+  
+  // Returns default name if name is not able to be retrieved
+  return "John Doe";
 }
