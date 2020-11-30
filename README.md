@@ -356,11 +356,35 @@ Let's name our application **BrightChatbot** and make its visibility **Private**
 
 Congratulations, you’ve now made your first `Wit.ai` application. 
 
-![](images/4_3.jpg)
+### Connecting the Custom `Wit.ai` NLP Model to your Facebook for Developers App
 
-On the left side, you will see three tabs titled **Understanding**, **Management** and **Insights**. Let’s start by training out chatbot on the **Understanding** tab.
+We will now connect the NLP model to your Facebook for Developers application.  This is done by going to your Facebook for Developers application’s Messenger Settings page and toggling the built-in NLP option for your page under the **Built-In NLP** section.
+
+![](images/nlp_select_page.jpg)
+
+Although Messenger comes with a default NLP engine with `Wit.ai`, we are training our own custom NLP model on `Wit.ai`. 
+
+To connect your `Wit.ai` model to your Facebook for Developers application, you will first need to generate a **Server Access Token**. Generating your Server Access Token is simple. In `Wit.ai`, click on the **Settings** on the left tab (under **Management**). 
+
+![](images/b2.jpg)
+
+Under **Server Access Token**, click **Generate New Token** and your access token will be generated.
+
+![](images/b3.jpg)
+
+Copy the Access Token and head over to the Facebook for Developers application's **Messenger Settings** page. Then, under **Built-In NLP**, click on the dropdown for **Default Language Model** and select **Custom Model**. Paste the server access token into the textbox field.
+
+![](images/nlp_add_token.jpg)
+
+Congratulations, your `Wit.ai` NLP model has been successfully connected to your Facebook chatbot application!
+
+We will now spending some time training our `Wit.ai` model to understand our custom intents and entities for our use case, to make our chatbot more capable of handling the messages it may face.
 
 ### Example of a Built-in Trait
+
+Back to the `Wit.ai` model, you will see three tabs titled **Understanding**, **Management** and **Insights** on the left. Let’s start by training our chatbot on the **Understanding** tab.
+
+![](images/4_3.jpg)
 
 Click the **Understanding** tab.  A sentence, such as a question to the chatbot, is known as an **utterance**. The intention behind this utterance is quite simply, the **intent**. 
 
@@ -445,20 +469,75 @@ Before we conclude with a test of our training’s accuracy, update the entities
 
 Set their entities to `estimated_arrival` for the text "when".
 
-### Evaluating Performance
+### Evaluating Performance and Additional Training
 
-Test your chatbot and see whether it can correctly identify the intents for these questions?
+Test your chatbot and see whether it can correctly identify the intents for these questions.
 
 | Utterance | Actual Intent |
 | --- | --- |
 | What would you suggest? | `recommendation` |
 | When will my order be here? | `enquiry_delivery` |
 
-In this scenario, it should be a success! However, it is completely all right if the model does not recognise all of the intents correctly. In machine learning, the model will only work well with lots and lots of training. Therefore, do remember to train the model with these new data!
+In this scenario, it should be a success! However, it is completely alright if the model does not recognise all of the intents correctly. In machine learning, the model will only work well with lots and lots of training. Therefore, do remember to train the model with these new data!
 
-### Connecting the Custom `Wit.ai` Model to your Facebook for Developers App
+#### Reviewing Confidence Levels
 
-You can now connect your `Wit.ai` model to your Facebook for Developers App! You can either use the Messenger Settings or Graph API to do so. The steps to connect the model to your application can be found at https://developers.facebook.com/docs/messenger-platform/built-in-nlp#customizing_nlp
+We previously trained the chatbot to identify the word "cookies" as being under the entity `product_type`, with a resolved value of `baker`. This is meant to represent baked goods.
+
+Let us evaluate the chatbot with this sentence “Do you have many types of cookies?”
+
+![](images/a1.jpg)
+
+You will see that while the model is able to correctly identify the intent and entity, it has a confidence of 79%. This means that the model is only 79% confident that it has correctly identified the entity within the sentence. By adding more training data (i.e. more utterances) to train the model, you can increase its confidence level on a wider array of inputs from consumers. 
+
+For intents, note that you can also view the confidence by clicking on the dropdown list arrow icon beside the identified intent.
+
+![](images/b1.jpg)
+
+#### Retraining the Model to Detect New Terms
+
+What happens if the model is unable to identify the intent or entity (or both!) from an utterance? 
+
+Evaluate the model with the sentence “What type of cookie is there?” 
+The model will correctly identify this as being under the intent `recommendation` but it cannot match "cookie" to the entity `product_type`.
+
+![](images/a3.jpg)
+
+To make your model understand these new terms, remember to continuously train it with a larger number of utterances using the steps shown previously in [Training the Model to Understand the Intent of a Message](#training-the-model-to-understand-the-intent-of-a-message) and [Training the Model to Understand the Entity in a Message](#training-the-model-to-understand-the-entity-in-a-message) sections.
+
+Now you must be thinking, where am I going to find the time to come up with so many different utterances that users could possibly ask? Fret not, as the `Wit.ai` platform records these messages as they are sent to the bot!
+
+### Training with Inputs from Users
+
+> Messages sent to the Facebook Messenger chatbot will only be received by the Wit.ai model after the Wit.ai application has been connected to the Facebook Messenger application. We have shown you how to connect them in an earlier section of our tutorial: [Connecting the Custom Wit.ai NLP Model to your Facebook for Developers App](#connecting-the-custom-witai-nlp-model-to-your-facebook-for-developers-app)!
+
+What is the best way to gather more data to train the model? Our answer: Get the questions from your customers directly! The beauty of `Wit.ai` is that every message that gets sent to your chatbot gets recorded on the **Understanding** tab that we used to train our model.
+
+![](images/a4.jpg)
+
+You can simply click the down arrow beside each string of text to open additional options to **Train and Validate** that utterance (as per what you are already familiar with from the previous sections).
+
+![](images/a6.jpg)
+
+Alternatively, if the utterance is irrelevant, you can mark it as **Out of Scope** (by checking the checkbox) before clicking on **Train and Validate**.
+
+![](images/a7.jpg)
+
+Only label an utterance as **Out of Scope** if you want to train the model to recognise it as one that is not meant to be handled in the future. 
+
+> Note that upon clicking the intent/entity dropdown, only trained intents and/or entities will be recommended. Should you want to train a new intent and/or entity, you will have to create it from scratch.
+
+This sums up training your chatbot with `Wit.ai`’s easy-to-use NLP model!
+
+### More on `Wit.ai` Integration with Facebook Messenger
+
+You have finished training your model and integrating it with your Facebook chatbot application, great job! Here is a brief description of how the `Wit.ai` NLP model integrates with Facebook Messenger for those of you who are more curious.
+
+Messages that are received by the chatbot are inputed to the model to identify intents, entities and traits. When the model detects any of them, it ties each of them to a confidence value. 
+
+A confidence value falls between 0 and 1, showing how confident the NLP model is of what has been detected. The closer the confidence is to 1, the more confident the model is of its interpretation. The more you train your model, the better it gets at identifying these values and the more confident it will be in interpreting messages coming from users interacting with your chatbot.
+
+Within your Facebook Messenger webhook, you can handle received messages by setting your own criteria for handling these responses based on the identified intents, entities and/or traits, which are usually based on `Wit.ai` model. The next section, processing messages with NLP, will discuss this in detail.
 
 ## Processing Messages with NLP
 
