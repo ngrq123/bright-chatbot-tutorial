@@ -2,19 +2,19 @@
 
 ## Introduction
 
-Chatbots today are the face of customer services across many businesses as it is a form of automation that allows them to free up manpower for other operations. NGOs can greatly benefit through these areas and our team felt that it is possible to help alleviate their lack of manpower through this technology.
+Chatbots are the face of customer service across many businesses as it is a form of automation that enables them to free up manpower for other operations. Businesses can greatly benefit from these efficiency gains and  alleviate their lack of manpower through automating their chat services. 
 
-Also, during this period, many of us find ourselves browsing online stores to purchase our daily necessities. Therefore, chatbots have also found themselves relevant in this trend to create immersive chat experiences in online commerce businesses. Some users will want to have human-like interactions in their shopping experiences - and that is enabled through the use of a chatbot.
+Consumers are increasingly using ecommerce sites to replace their everyday shopping needs. Some users prefer human-like interactions in their shopping experiences and the technologies used to build chatbots have become intelligent enough to create immersive chat experiences without human intervention. 
 
-We felt that this use case would be a good example to showcase the functionalities of a Messenger chatbot and introduce budding chatbot developers to learn how to get started on their own messaging commerce platforms using their Facebook Pages and `Wit.ai`.
+We felt that this business case would be a good example to showcase the functionalities of a Messenger chatbot and introduce budding chatbot developers to the tools needed to get started on their own messaging commerce platforms using their Facebook Pages and `Wit.ai`.
 
 ## Pre-Requisites
 
-The following subsections list the background knowledge and how to get started prior to creating a chatbot.
+The following subsections list the background knowledge and pre-requisites to create a chatbot.
 
 ### JavaScript Knowledge
 
-Basic Javascript knowledge on objects, conditional statements, and functions will be helpful in the implementation of Bright chatbot. Specific knowledge on Node.js is also used in this tutorial which acts as the server to handle communications between Bright and Facebook.
+Basic Javascript knowledge on objects, conditional statements, and functions will be helpful in the implementation of Bright chatbot. Specific knowledge on Node.js is also used in this tutorial, which acts as the server to handle communications between Bright and Facebook.
 
 Browse the following resources below to learn more about the technologies used:
 - JavaScript:  https://javascript.info/
@@ -36,10 +36,10 @@ Creating a Facebook Page is a key step in your journey to creating a Messenger e
 2. Fill in your page information
 3. Add images - adding a profile and cover image is important to allow others to identify your business
 
-Congratulations! You have done the setup of your Facebook Business Page! Next is on how to create a Messenger Bot for your page!
+Congratulations! You have completed the setup of your Facebook Business Page! Next up, is on how to create a Messenger Bot for your page!
 
 ### Optional: Add a “Send Message” Button
-After creating your very own Facebook Page for your business, you will want a way to communicate with your customers. Before even going into the details on how to create a chatbot, what better way than to direct users to send messages to you when they visit your page?
+After creating your very own Facebook Page for your business, you will want a way to communicate with your customers. Before even going into the details on how to create a chatbot, what better way is there to direct users to send messages to you when they visit your page than having a 'Send Message' button?
 
 This button should be found at the top of your page. Click on **Add a Button** and select the **Send Message** option.
 
@@ -47,7 +47,7 @@ This button should be found at the top of your page. Click on **Add a Button** a
 
 ### Optional: Create a Greeting
 
-Customize your personal message to your customers when they first start communicating with your page through Messenger. So how do we go about doing it?
+Customize your personal message to your customers when they first start communicating with your page through Messenger. So how do we go about doing this?
 
 1. Go to your page’s General Settings and select **Messaging**
 2. Scroll down and turn on **Show a greeting**
@@ -55,7 +55,7 @@ Customize your personal message to your customers when they first start communic
 
 ### Optional: Create Frequently Asked Questions and Responses
 
-Create a set of creative responses for frequently asked questions regarding your business. This is highly recommended before creating your chatbot as it helps you brainstorm and implement various prompts for users to start interacting with your page on Messenger.
+Create a set of creative responses for frequently asked questions regarding your business. This is highly recommended before creating your chatbot as it helps you brainstorm on what customers may ask and lets you implement various prompts for users to interact with your page on Messenger.
 
 Here is how you can do it:
 
@@ -175,7 +175,7 @@ There you have it, you have successfully connected your chatbot application with
 
 ## Sending and Receiving Messages
 
-Sending messages require the use of Send API via a post request coupled with your page access token included in your URL query string.
+Sending messages require the use of Send API via a POST request coupled with your page access token included in your URL query string.
 
 Below is a wrapper function that takes in the sender’s identifier (called Page-scoped ID, or PSID in short) and the response object. This function converts parameters into the standardised data structure and proceeds to send the response.
 
@@ -211,7 +211,7 @@ function callSendAPI(sender_psid, response) {
 }
 ```
 
-In the `request_body`, the recipient’s ID is the sender of the messenger, which can be referenced by the PSID. This allows us to specify which user the message response is for, and for the Messenger Platform to route to the right user. The message attribute in the request_body simply refers to the response of the message that you will like to send back.
+In the `request_body`, the recipient’s ID is the sender of the messenger, which can be referenced by the PSID. This allows us to specify which user the message response is for, and for the Messenger Platform to route to the right user. The message attribute in the `request_body` simply refers to the response of the message that you will like to send back.
 
 In order to make a HTTP request to the Messenger Platform, we will use the request package. More information on that package can be found here: https://www.npmjs.com/package/request.
 
@@ -411,7 +411,7 @@ During the training process, there is no need to wait for the previous utterance
 
 ### Training the Model to Understand the Entity in a Message
 
-What if instead of a general recommendation, the buyer wants to specifically buy a type of product such as cookies? We classify **cookies** as `baker` type products and would need the chatbot to recognise **cookies** as the **product_type** entity.
+What if instead of a general recommendation, the buyer wants to specifically buy a type of product such as cookies? We classify "cookies" as `baker` type products and would need the chatbot to recognise "cookies" as the `product_type` entity.
 
 Set utterance as “What types of cookies do you have?”
 The intent is `recommendation` by default as that’s the only intent we have trained so far.
@@ -420,7 +420,7 @@ To identify the intent, highlight "cookies":
 
 ![](images/4_7.jpg)
 
-Create the entity **product_type**. The entity is now shown prior to training. For more complicated sentences with multiple entities, you can highlight and label them one by one.
+Create the entity `product_type`. The entity is now shown prior to training. For more complicated sentences with multiple entities, you can highlight and label them one by one.
 
 Change the **Resolved value** to `baker` as we want the cookies to be identified as being in the baker category.
 
@@ -484,13 +484,13 @@ In this scenario, it should be a success! However, it is completely alright if t
 
 We previously trained the chatbot to identify the word "cookies" as being under the entity `product_type`, with a resolved value of `baker`. This is meant to represent baked goods.
 
-Let us evaluate the chatbot with this sentence “Do you have many types of cookies?”
+Let's evaluate the chatbot with this sentence “Do you have many types of cookies?”
 
 ![](images/a1.jpg)
 
 You will see that while the model is able to correctly identify the intent and entity, it has a confidence of 79%. This means that the model is only 79% confident that it has correctly identified the entity within the sentence. By adding more training data (i.e. more utterances) to train the model, you can increase its confidence level on a wider array of inputs from consumers. 
 
-For intents, note that you can also view the confidence by clicking on the dropdown list arrow icon beside the identified intent.
+Note that you can also view the confidence of intents by clicking on the intent dropdown.
 
 ![](images/b1.jpg)
 
@@ -509,7 +509,7 @@ Now you must be thinking, where am I going to find the time to come up with so m
 
 ### Training with Inputs from Users
 
-> Messages sent to the Facebook Messenger chatbot will only be received by the Wit.ai model after the Wit.ai application has been connected to the Facebook Messenger application. We have shown you how to connect them in an earlier section of our tutorial: [Connecting the Custom Wit.ai NLP Model to your Facebook for Developers App](#connecting-the-custom-witai-nlp-model-to-your-facebook-for-developers-app)!
+> Messages sent to the Facebook Messenger chatbot will only be received by the `Wit.ai` model after the `Wit.ai` application has been connected to the Facebook Messenger application. We have shown you how to connect them in an earlier section of our tutorial: [Connecting the Custom Wit.ai NLP Model to your Facebook for Developers App](#connecting-the-custom-witai-nlp-model-to-your-facebook-for-developers-app)!
 
 What is the best way to gather more data to train the model? Our answer: Get the questions from your customers directly! The beauty of `Wit.ai` is that every message that gets sent to your chatbot gets recorded on the **Understanding** tab that we used to train our model.
 
@@ -709,7 +709,7 @@ function handleDeliveryEnquiry() {
 }
 ```
 
-Let us try to see if the chatbot can handle the message "Can my order arrive in 2 days?". It works! 
+Let's see if the chatbot can handle the message "Can my order arrive in 2 days?". It works! 
 
 What about "Can I receive the package in 2 days?". Unfortunately, it is unable to correctly classify the intent based on the response. We will need to investigate why.
 
@@ -936,9 +936,9 @@ const orderSchema = new mongoose.Schema({
 
 The **key** in the schema object is the name of the column, and **value** is the database type that you want your column to be in the database. Here we are using **mongoose** as a library and you can see the [documentation](https://mongoosejs.com/docs/) to learn how to perform CRUD operations in Node.js.
 
-An advantage on using MongoDB is that you would not have to create the collections, as the database system will automatically create them when we the first set of data (called document) is inserted into the database.
+One advantage of using MongoDB is that you would not have to create the collections, as the database system will automatically create them when we insert the first set of data (called **document**) into the database.
 
-Now, you will need to insert data into the database. Mock data to be inserted into the database can be found in the following section.
+Mock data to be inserted into the database can be found in the following section.
 
 ## Option 2: Adding Mock Commerce Data in `index.js`
 
@@ -1386,9 +1386,10 @@ When clicked, the receipt expands:
 
 ![](images/receipt.png)
 
-## Personalizing replies to your users
+## Personalising Replies with User First Name
+One way we can further personalise the chatbot's responses by incorporating the user's first name.
 
-Facebook's graph api allows us to grab publically available information about your customers that are using the Facebook platform. Therefore, we are able to retrieve our customer's first name through the use of the graph api. Let's see how we can do it below!
+To do this, we will use Facebook Graph API to retrieve publicly available information off the user's Facebook account. Let's retrieve the user's first name with a new `getName` function:
 
 ```js
 async function getName(PAGE_ACCESS_TOKEN, sender_psid){
@@ -1404,7 +1405,11 @@ async function getName(PAGE_ACCESS_TOKEN, sender_psid){
 }
 ```
 
-By calling the `getName` function by passing in the `PAGE_ACCESS_TOKEN` and `sender_psid`, which is retrieved when the user uses the chatbot, we are able to retrieve the user's name and personalise the message with their name to allow you to have better social ineteraction with your users.
+The `getName` function takes in two parameters: `PAGE_ACCESS_TOKEN` and `sender_psid`.  These are required to retrieve the user's first name. 
+
+> The `getName` function sends a request to Facebook and the result has to be processed before generating a response. To do so, you need to utilise async/await. You can only perform an await in an asynchronous function and whenever you call an asynchronous function, any function that calls it has to be asynchronous as well.
+
+We will incorporate the user's first name in the welcome response and in the receipt.
 
 ```js
 // Processes and sends text message
@@ -1429,7 +1434,7 @@ async function processMessage(sender_psid, message, nlp) {
 
 ![](images/hello_message.jpg)
 
-Also, you can further customize the receipt with your customer's name by likewise calling the `getName` function like this:
+To customise the receipt with your user's first name, we modify the `generateReceiptResponse` function as follows:
 
 ```js
 // Processes and sends text message
@@ -1478,9 +1483,7 @@ async function generateReceiptResponse(sender_psid, order) {
 }
 ```
 
-![](images/order_confirmation.jpg)
-
-> Do take note that in javascript, you can only perform an await in an async function and whenever you call any async function, any parent function that calls it has to be async as well. Also, for an async api call, you've got to perform an await to retrieve the data from the api call.
+![](images/order_confirmation.jpg) 
 
 ## Challenge 1: Order Enquiry
 
@@ -1498,17 +1501,17 @@ Implement the `enquiry_product` intent in the `processPayload` function. You mig
 
 ## Wrapping Up
 
-In this tutorial, you have learnt to build a commerce chatbot that answers general enquiries, provides recommendations, and provides a seemless order process to users. You have set up the entire technology stack: Facebook page, Facebook for Developer App, `Wit.ai` model, MongoDB database and Express.js application that includes a webhook that listens for incoming events.
+In this tutorial, you have learnt to build an ecommerce chatbot that answers general enquiries, provides recommendations, and provides a seamless order process to users. You have set up the entire technology stack: Facebook Page, Facebook for Developer App, `Wit.ai` model, MongoDB database and Express.js application that includes a webhook that listens for incoming events.
 
-We explored some of the many features of Messenger, including templates and quick replies, and went through the differences between message and postback events.
+We explored some of the many features of Facebook Messenger, including templates and quick replies, and went through the differences between message and postback events.
 
 Additionally, you have seen how NLP is used in chatbots, converting unstructured text into categories - allowing us to create a smarter Messenger chatbot that elevates the Messenger experience.
 
-An NLP engine integrated with Facebook messenger has many potential use cases and opportunity for reusability.
+An NLP engine integrated with Facebook Messenger has many potential use cases and opportunity for reusability.
 
-For example, a CSR-supportive use case could be Community Service Volunteer Recruitment. A person who wants to volunteer messages the Chatbot with their availability for the week and the chatbot returns a list of organisations that need volunteers on those days. The volunteer selects an organisation from the list and reads up on what type of roles are required. The volunteer selects a role and a time that they are able to attend. Organisation has gained a volunteer through the chatbot!
+For example, a CSR-supportive use case could be Community Service Volunteer Recruitment. A person who wants to volunteer, messages the Chatbot with their availability for the week and the chatbot returns a list of organisations that need volunteers on those days. The volunteer selects an organisation from the list and reads up on what type of roles are required. The volunteer selects a role and a time that they are able to attend. Organisation has gained a volunteer through the chatbot!
 
-For a more business-minded and advice-reliant use case, let’s refer to an Over-The-Counter e-Pharmacy example. Someone at home has mild symptoms such as a headache and doesn’t want to travel to a pharmacy. The would-be customer messages the chatbot with their symptoms. The chatbot which is only allowed to advise on utterances with a high level of confidence, advises the customer to buy paracetamol. The customer then has the option to buy paracetamol with the click of a button for home delivery.
+For a more business-minded and advice-reliant use case, let’s refer to an Over-The-Counter e-Pharmacy example. In this scenario, the chatbot is only allowed to advise on utterances which it understands with a high level of confidence. Say, someone at home has mild symptoms such as a headache and doesn’t want to travel to a pharmacy. The would-be customer messages the chatbot with their symptoms. The chatbot advises the customer to buy paracetamol. The customer then has the option to buy paracetamol with the click of a button for home delivery.
 
 ## Acknowledgements
 
@@ -1519,6 +1522,7 @@ Special shoutout to Douglas Sim and Jelissa Ong, who helped to build the Bright 
 - Bright Social Enterprise E-Commerce Chatbot: https://github.com/ngrq123/bright-social-enterprise-commerce-bot
 - Built-In Entities and Traits: https://wit.ai/docs/built-in-entities/20200513/
 - Button Template: https://developers.facebook.com/docs/messenger-platform/send-messages/template/button
+- Graph API User: https://developers.facebook.com/docs/graph-api/reference/v8.0/user
 - How do I create a Facebook Page?: https://www.facebook.com/business/help/104002523024878
 - Mongoose Getting Started: https://mongoosejs.com/docs/index.html
 - Natural Language Processing: https://developers.facebook.com/docs/messenger-platform/built-in-nlp
