@@ -210,6 +210,7 @@ async function processMessage(sender_psid, message, nlp) {
 
     if (traits['wit$greetings'] && traits['wit$greetings'][0]['value'] === 'true') {
       console.log('Is greeting');
+      //Add the getName function call here
       let name = await getName(PAGE_ACCESS_TOKEN,sender_psid);
       return getResponseFromMessage('Hi ' + name + '! Welcome to Bright. How can I help you?');
     }
@@ -521,7 +522,6 @@ async function getName(PAGE_ACCESS_TOKEN, sender_psid){
   let response = await fetch(uri + sender_psid + "?fields=first_name&access_token=" + PAGE_ACCESS_TOKEN);
   if (response.ok) {
       let body = await response.json();
-      console.log(body.first_name)
       return body.first_name;
   }
   

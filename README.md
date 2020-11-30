@@ -1386,6 +1386,102 @@ When clicked, the receipt expands:
 
 ![](images/receipt.png)
 
+## Personalizing replies to your users
+
+Facebook's graph api allows us to grab publically available information about your customers that are using the Facebook platform. Therefore, we are able to retrieve our customer's first name through the use of the graph api. Let's see how we can do it below!
+
+```js
+async function getName(PAGE_ACCESS_TOKEN, sender_psid){
+  let uri = "https://graph.facebook.com/v8.0/"
+  let response = await fetch(uri + sender_psid + "?fields=first_name&access_token=" + PAGE_ACCESS_TOKEN);
+  if (response.ok) {
+      let body = await response.json();
+      return body.first_name;
+  }
+  
+  // Returns default name if name is not able to be retrieved
+  return "John Doe";
+}
+```
+
+By calling the `getName` function by passing in the `PAGE_ACCESS_TOKEN` and `sender_psid`, which is retrieved when the user uses the chatbot, we are able to retrieve the user's name and personalise the message with their name to allow you to have better social ineteraction with your users.
+
+```js
+// Processes and sends text message
+async function processMessage(sender_psid, message, nlp) {
+  
+  if (nlp['intents'].length === 0) {
+    
+    // Check if greeting
+    let traits = nlp['traits'];
+
+    if (traits['wit$greetings'] && traits['wit$greetings'][0]['value'] === 'true') {
+      console.log('Is greeting');
+      //Add the getName function call here
+      let name = await getName(PAGE_ACCESS_TOKEN,sender_psid);
+      return getResponseFromMessage('Hi ' + name + '! Welcome to Bright. How can I help you?');
+    }
+    
+    console.log('Returning default response');
+    return getDefaultResponse();
+  }
+```
+
+![](images/hello_message.jpg)
+
+Also, you can further customize the receipt with your customer's name by likewise calling the `getName` function like this:
+
+```js
+// Processes and sends text message
+async function generateReceiptResponse(sender_psid, order) {
+  let total_price = order.reduce((acc, p) => acc + p['price'] * p['quantity'], 0);
+  // Add getName function here to retrieve the name
+  let name = await getName(PAGE_ACCESS_TOKEN,sender_psid);
+
+  return {
+    attachment: {
+      type: "template",
+      payload: {
+        template_type: "receipt",
+        recipient_name: name,
+        order_number: "bf23ad46d123",
+        currency: "SGD",
+        payment_method: "PayPal",
+        order_url: "",
+        address: {
+          street_1: "9 Straits View",
+          city: "Singapore",
+          postal_code: "018937",
+          state: "SG",
+          country: "SG"
+        },
+        summary: {
+          subtotal: total_price.toFixed(2),
+          shipping_cost: 5,
+          total_tax: ((total_price+5)*0.07).toFixed(2),
+          total_cost: (total_price+5).toFixed(2)
+        },
+        elements: order.map(product => {
+          return {
+            title: `${product["name"]}`,
+            title: product["title"],
+            subtitle: product["pattern"],
+            quantity: product["quantity"],
+            price: product["price"]*product["quantity"],
+            currency: "SGD",
+            image_url: product["image_link"]
+          };
+        })
+      }
+    }
+  };
+}
+```
+
+![](images/order_confirmation.jpg)
+
+> Do take note that in javascript, you can only perform an await in an async function and whenever you call any async function, any parent function that calls it has to be async as well. Also, for an async api call, you've got to perform an await to retrieve the data from the api call.
+
 ## Challenge 1: Order Enquiry
 
 In the previous section - [Checkout](#checkout) - we created orders for fulfillment. Now, extend the chatbot's functionality by implementing order enquiry in the chatbot, which allows users to enquire on their order status.
