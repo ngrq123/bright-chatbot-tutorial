@@ -1,5 +1,64 @@
 # Create Smarter Messenger Experiences on Facebook with Bright Commerce Chatbot
 
+**Table of Contents**
+- [Create Smarter Messenger Experiences on Facebook with Bright Commerce Chatbot](#create-smarter-messenger-experiences-on-facebook-with-bright-commerce-chatbot)
+  - [Introduction](#introduction)
+  - [Pre-Requisites](#pre-requisites)
+    - [JavaScript Knowledge](#javascript-knowledge)
+    - [Git Knowledge](#git-knowledge)
+    - [Facebook Page](#facebook-page)
+    - [Optional: Add a “Send Message” Button](#optional-add-a-send-message-button)
+    - [Optional: Create a Greeting](#optional-create-a-greeting)
+    - [Optional: Create Frequently Asked Questions and Responses](#optional-create-frequently-asked-questions-and-responses)
+    - [Connect your Webhook onto your Facebook for Developers App](#connect-your-webhook-onto-your-facebook-for-developers-app)
+      - [Create an App on Facebook for Developers](#create-an-app-on-facebook-for-developers)
+      - [Create the Webhook](#create-the-webhook)
+      - [Hosting on Heroku](#hosting-on-heroku)
+      - [Link the Webhook with your Facebook for Developers App](#link-the-webhook-with-your-facebook-for-developers-app)
+  - [Sending and Receiving Messages](#sending-and-receiving-messages)
+    - [Receiving and Sending Back the Same Message](#receiving-and-sending-back-the-same-message)
+    - [Sending Standard Responses](#sending-standard-responses)
+  - [Introduction to `Wit.ai` Natural Language Processing (NLP)](#introduction-to-witai-natural-language-processing-nlp)
+    - [Creating a Customised `Wit.ai` Application](#creating-a-customised-witai-application)
+    - [Connecting the Custom `Wit.ai` NLP Model to your Facebook for Developers App](#connecting-the-custom-witai-nlp-model-to-your-facebook-for-developers-app)
+    - [Example of a Built-in Trait](#example-of-a-built-in-trait)
+    - [Training the Model to Understand the Intent of a Message](#training-the-model-to-understand-the-intent-of-a-message)
+    - [Training the Model to Understand the Entity in a Message](#training-the-model-to-understand-the-entity-in-a-message)
+    - [Adding more Training Data](#adding-more-training-data)
+    - [Making Changes in the Management Tab](#making-changes-in-the-management-tab)
+    - [Evaluating Performance and Additional Training](#evaluating-performance-and-additional-training)
+      - [Reviewing Confidence Levels](#reviewing-confidence-levels)
+      - [Retraining the Model to Detect New Terms](#retraining-the-model-to-detect-new-terms)
+    - [Training with Inputs from Users](#training-with-inputs-from-users)
+    - [More on `Wit.ai` Integration with Facebook Messenger](#more-on-witai-integration-with-facebook-messenger)
+  - [Processing Messages with NLP](#processing-messages-with-nlp)
+    - [Handling the Greeting Trait](#handling-the-greeting-trait)
+    - [Handling the General Enquiry Intent](#handling-the-general-enquiry-intent)
+    - [Handling the Delivery Enquiry Intent](#handling-the-delivery-enquiry-intent)
+      - [Working with `Wit.ai` and Messenger](#working-with-witai-and-messenger)
+      - [Personalising Responses with the Value of `wit/datetime` Built-In Entity](#personalising-responses-with-the-value-of-witdatetime-built-in-entity)
+  - [Option 1: Creating a Business Database](#option-1-creating-a-business-database)
+  - [Option 2: Adding Mock Commerce Data in `index.js`](#option-2-adding-mock-commerce-data-in-indexjs)
+  - [Solution Overview](#solution-overview)
+  - [Listing Products](#listing-products)
+    - [Introduction to Templates](#introduction-to-templates)
+    - [Updating `processMessage`](#updating-processmessage)
+  - [Adding to Cart](#adding-to-cart)
+    - [Deciphering Postbacks and Accessing Payload](#deciphering-postbacks-and-accessing-payload)
+    - [Processing the Postback Payload](#processing-the-postback-payload)
+    - [Following Up with Quick Replies](#following-up-with-quick-replies)
+  - [Checkout](#checkout)
+    - [Mocking Payment with Button Template](#mocking-payment-with-button-template)
+    - [Issuing a Receipt with the Receipt Template](#issuing-a-receipt-with-the-receipt-template)
+  - [Personalising Replies with User's First Name using Facebook Graph API](#personalising-replies-with-users-first-name-using-facebook-graph-api)
+  - [Challenge 1: Order Enquiry](#challenge-1-order-enquiry)
+  - [Challenge 2: Implement Product Enquiries](#challenge-2-implement-product-enquiries)
+  - [Wrapping Up](#wrapping-up)
+  - [Acknowledgements](#acknowledgements)
+  - [References](#references)
+  - [Tutorial GitHub Link](#tutorial-github-link)
+  - [Devpost Submission](#devpost-submission)
+
 ## Introduction
 
 Chatbots are the face of customer service across many businesses as it is a form of automation that enables them to free up manpower for other operations. Businesses can greatly benefit from these efficiency gains and  alleviate their lack of manpower through automating their chat services. 
@@ -1386,7 +1445,7 @@ When clicked, the receipt expands:
 
 ![](images/receipt.png)
 
-## Personalising Replies with User's First Name
+## Personalising Replies with User's First Name using Facebook Graph API
 
 One way we can further personalise the chatbot's responses is by incorporating the user's first name.
 
@@ -1409,6 +1468,19 @@ async function getName(PAGE_ACCESS_TOKEN, sender_psid) {
 ```
 
 The `getName` function takes in two parameters: `PAGE_ACCESS_TOKEN` and `sender_psid`.  These are required to retrieve the user's first name. 
+
+To use `fetch`, we import the `node-fetch` package:
+
+```js
+// Imports dependencies and set up http server
+const
+  express = require('express'),
+  bodyParser = require('body-parser'),
+  app = express().use(bodyParser.json()), // creates express http server
+  dotenv = require('dotenv'),
+  request = require('request');
+  global.fetch = require("node-fetch");
+```
 
 > The `getName` function sends a request to Facebook and the result has to be processed before generating a response. To do so, you need to utilise async/await. You can only perform an await in an asynchronous function and whenever you call an asynchronous function, any function that calls it has to be asynchronous as well.
 
